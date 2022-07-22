@@ -1,0 +1,18 @@
+{% extends 'commons/base.html.twig' %}
+{% block title %}SnowTricks{% endblock %}
+
+{% block style %}
+    header.masthead { 
+        background: url("{{ asset('img/home-bg.jpg') }}") center no-repeat !important; 
+    }
+{% endblock %}
+
+
+{% block content %}
+    <div>
+        {% for trick in tricks %}
+            <h2>{{ trick.name}}</h2>
+            <p>{{ trick.description }}</P>
+        {% endfor %}
+    </div>
+{% endblock %}
