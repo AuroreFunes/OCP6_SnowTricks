@@ -62,7 +62,7 @@ class TrickImage
         return $this;
     }
 
-    public function isIsDefault(): ?bool
+    public function getIsDefault(): ?bool
     {
         return $this->isDefault;
     }

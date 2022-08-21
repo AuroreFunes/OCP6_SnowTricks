@@ -1,0 +1,113 @@
+{% extends 'commons/base.html.twig' %}
+{% block title %}{{ trick.name }}{% endblock %}
+
+{% block style %}
+header.masthead { 
+    background: url("{{ asset('img/home-bg.jpg') }}") center no-repeat !important;
+}
+.site-heading {
+    display: none;
+}
+
+article header.masthead {
+    background: white url("{{ asset('img/tricks/') }}{{ trick.defaultImage.path }}") center no-repeat !important; 
+}
+article .site-heading {
+    display: block !important;
+}
+.trick-content {
+    position: relative;
+    top: -300px;
+    border: solid 1px black;
+    box-shadow: 2px 2px 10px black;
+}
+.trick-content section {
+    padding: 20px;
+}
+.trick-btn {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}
+.gallery {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content : space-around;
+    }
+.gallery figure {
+    margin: 10px;
+    max-width: 200px;
+}
+.gallery figure img {
+    border: solid 1px black;
+}
+.gallery iframe {
+    max-width: 200px;
+    border: solid 1px black;
+}
+.trick-infos {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content : space-around;
+}
+.trick-infos div {
+    border-radius : 15px;
+    border: solid 1px black;
+    margin: 3px 10px 3px 10px;
+    padding: 5px;
+    font-size: 0.8em;
+}
+{% endblock %}
+
+{% block content %}
+    <article class="trick-content">
+        <header class="masthead">
+            <div class="trick-btn">
+                <button type="button" class="btn btn-sm"><i class="bi bi-pencil-fill"></i></button>
+                <button type="button" class="btn btn-sm"><i class="bi bi-trash3-fill"></i></button>
+            </div>
+
+            <div class="container position-relative px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+                        <div class="site-heading">
+                            <h1>{{ trick.name }}</h1>
+                            <span class="subheading">({{ trick.group.name }})</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <section class="gallery">
+        {% for image in trick.images %}
+            <figure class="col-lg-3 col-md-4 col-6">
+                <img alt="{{ trick.name }}" src="{{ asset('img/tricks/') }}{{ image.path }}" class="img-fluid" />
+            </figure>
+        {% endfor %}
+
+        {% for video in trick.videos %}
+            <figure class="col-lg-3 col-md-4 col-6">
+                <iframe
+                    src="{{ video.path }}"
+                    frameborder="0"
+                    allow="autoplay; encrypted-media"
+                    allowfullscreen>
+                </iframe>
+            </figure>
+        {% endfor %}   
+        </section>
+
+        <section>
+            {{ trick.description }}
+        </section>
+
+        <section class="trick-infos">
+            <div>Groupe de la figure : {{ trick.group.name }}</div>
+            <div>Date de création : {{ trick.createdAt | date('d/m/Y à h:m') }}</div>
+            {% if trick.createdAt != trick.updatedAt %}
+                <div>Dernière modification : {{ trick.updatedAt | date('d/m/Y à h:m') }}</div>
+            {% endif %}
+        </section>
+    </article>
+{% endblock %}

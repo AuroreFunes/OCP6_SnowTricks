@@ -6,6 +6,8 @@ use App\Repository\TrickRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\BrowserKit\History;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=TrickRepository::class)
@@ -20,12 +22,20 @@ class Trick
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, unique=true)
+     * @Assert\Length(
+     *      min=2,
+     *      minMessage="Le nom doit contenir au moins deux caractères",
+     *      max=255,
+     *      maxMessage="Le nom ne peut pas dépasser 255 caractères")
      */
     private $name;
 
     /**
      * @ORM\Column(type="text")
+     * @Assert\Length(
+     *      min=20,
+     *      minMessage="La description doit comporter au moins 20 caractères")
      */
     private $description;
 
@@ -222,5 +232,63 @@ class Trick
         }
 
         return $this;
+    }
+
+    // ========================================================================================
+    // PICTURES
+    // ========================================================================================
+    public function getDefaultImage() :?TrickImage
+    {
+        foreach ($this->trickImages as $image) {
+            if ($image->getIsDefault()) {
+                return $image;
+            }
+        }
+        return null;
+    }
+
+    public function setDefaultImage(TrickImage $defaultImage, bool $add = false)
+    {
+        $oldImage = $this->getDefaultImage();
+        if (null !== $oldImage) {
+            $oldImage->setIsDefault(false);
+        }
+
+        $defaultImage->setIsDefault(true);
+
+        if ($add) {
+            $this->addImage($defaultImage);
+        }
+
+        return $this;
+    }
+
+    // ========================================================================================
+    // HISTORY
+    // ========================================================================================
+    public function getCreatedAt() :\DateTime
+    {
+        $history = $this->getHistories()->get(0);
+
+        foreach($this->getHistories() as $currentHistory) {
+            if ($history->getDate() > $currentHistory->getDate()) {
+                $history = $currentHistory;
+            }
+        }
+
+        return $history->getDate();
+    }
+
+    public function getUpdatedAt() :\DateTime
+    {
+        $history = $this->getHistories()->get(0);
+
+        foreach($this->getHistories() as $currentHistory) {
+            if ($history->getDate() < $currentHistory->getDate()) {
+                $history = $currentHistory;
+            }
+        }
+
+        return $history->getdate();
     }
 }

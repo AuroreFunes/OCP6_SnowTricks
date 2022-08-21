@@ -39,6 +39,58 @@ class TrickRepository extends ServiceEntityRepository
         }
     }
 
+    public function findAllTricksWithDefaultImage()
+    {
+/*
+dd($this->createQueryBuilder('t')
+->leftJoin('t.trickImages', 'ti')
+->where('ti.isDefault = 1')
+->addOrderBy('t.name')
+->getQuery()
+->getResult());
+*/
+        $db = $this->getEntityManager()->getConnection();
+
+        $sql = "SELECT  t.*,
+                        ti.path AS imagePath
+                FROM trick t
+                LEFT JOIN trick_image ti ON ti.trick_id = t.id
+                WHERE ti.is_default = 1";
+        
+        $stmt = $db->prepare($sql);
+
+        return $stmt->executeQuery()->fetchAllAssociative();
+
+/*
+        return $this->createQueryBuilder('t')
+            ->leftJoin('t.trickImages', 'ti')
+            ->where('ti.isDefault = 1')
+            ->addOrderBy('t.name')
+            ->getQuery()
+            ->getResult();
+*/
+    }
+
+
+    public function findTrickInfo(Trick $trick)
+    {
+
+        $db = $this->getEntityManager()->getConnection();
+
+        $sql = "SELECT
+                    MIN(h.date) AS createdAt,
+                    MAX(h.date) AS updatedAt,
+                    ti.path AS defaultImage
+                FROM trick_history h
+                LEFT JOIN trick_image ti ON ti.trick_id = :trickId
+                WHERE h.trick_id = :trickId AND ti.is_default = 1";
+        
+        $stmt = $db->prepare($sql);
+
+        return $stmt->executeQuery(['trickId' => $trick->getId()])->fetchAssociative();
+    }
+
+
 //    /**
 //     * @return Trick[] Returns an array of Trick objects
 //     */

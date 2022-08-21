@@ -5,14 +5,113 @@
     header.masthead { 
         background: url("{{ asset('img/home-bg.jpg') }}") center no-repeat !important; 
     }
-{% endblock %}
 
+    .gallery {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content : space-around;
+    }
+    .gallery figure {
+        border: solid 1px black;
+        margin: 10px;
+        max-width: 250px;
+    }
+    .gallery-infos {
+        padding: 5px;
+        display: flex;
+        flex-wrap: nowrap;
+    }
+    .gallery-title {
+        width: 100%;
+    }
+    .gallery-btn {
+        min-width: 85px;
+        text-align: right;
+    }
+{% endblock %}
 
 {% block content %}
-    <div>
-        {% for trick in tricks %}
-            <h2>{{ trick.name}}</h2>
-            <p>{{ trick.description }}</P>
-        {% endfor %}
+    <div class="row">
+        <div id="gallery" class="gallery">
+            {% include 'pages/tricks/trickElement.html.twig' %}
+        </div>
     </div>
+
+    <div class="row mb-3">
+        <button type="button" class="btn btn-primary" id="loadMore" page="1">Charger plus</button>
+    </div>
+
+<!-- Modal -->
+<div class="modal fade" id="deleteTrickModal" tabindex="-1" aria-labelledby="deleteTrickModalLabel" 
+    aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteTrickModalLabel">Supprimer la figure</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Souhaitez-vous vraiment supprimer cette figure ?
+        <input type="hidden" name="trickId" id="trickId" />
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger">Oui</button>
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Non</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
+
+{% block javaScript %}
+<script type="text/javascript">
+
+
+    $(document).ready(function() {
+        
+        // load more tricks
+        $(document).on("click","#loadMore", function() {
+
+            var page = parseInt($(this).attr('page'));
+
+            $.ajax({url: "{{ path('app_trick_load_more') }}", type: 'POST',
+                data: {
+                    page: page
+                },
+                success: function(result, status) {
+
+                    if (undefined != result) {
+                        // update page number
+                        $("#loadMore").attr('page', page + 1);
+
+                        // add tricks in gallery
+                        $("#gallery").append(result.html);
+
+                        if (!result.moreTricks) {
+                            $("#loadMore").attr('disabled', true);
+                            $("#loadMore").fadeOut(1000);
+                        }
+
+                    } else {
+                        $("#loadMore").attr('disabled', true);
+                        $("#loadMore").fadeOut(1000);
+                    }
+
+                },
+                error: function(error) {
+                    alert("Une erreur s'est produite. Réessayez un peu plus tard.");
+                }});
+            
+            })
+
+        // save TrickId for deleteModal
+        $(document).on("click",".openModalDeleteTrick", function() {
+            document.getElementById('trickId').value = $(this).data("id");
+        });
+
+    });
+
+</script>
+{% endblock %}
+
