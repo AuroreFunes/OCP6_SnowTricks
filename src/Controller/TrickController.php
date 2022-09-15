@@ -3,13 +3,19 @@
 namespace App\Controller;
 
 use App\Entity\Trick;
+use App\Entity\TrickComment;
 use App\Form\TrickType;
+
+use App\Form\TrickCommentType;
+
 use App\Service\Trick\LoadTricksService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+
+use function Symfony\Component\DependencyInjection\Loader\Configurator\env;
 
 class TrickController extends AbstractController
 {
@@ -36,6 +42,8 @@ class TrickController extends AbstractController
         $twigParams['pageTitle'] = "";
         $twigParams['pageSubTitle'] = "";
         $twigParams['trick'] = $trick;
+        $comment = new TrickComment();
+        $twigParams['commentForm'] = $this->createForm(TrickCommentType::class, $comment)->createView();
 
         return $this->render('pages/tricks/showTrick.html.twig', $twigParams);
     }
@@ -67,5 +75,66 @@ class TrickController extends AbstractController
 
         return $response;
     }
+
+
+    /**
+     * @Route("/createTrick/", name="app_trick_create")
+     */
+    public function createTrick(Request $request)
+    {   // on peut donner deux routes (avec chacune leur nom) à une fonction !
+            // => avec le paramconverter, ajouter Trick dans les paramètres (et penser à mettre = null)
+        $trick = new Trick();
+
+        /* $form = $this->createFormBuilder($trick)
+            ->add('name')
+            ->add('description')
+            ->add('send', SubmitType::class, [
+                'label' => "Enregistrer"
+            ])
+            ->getForm();
+            */
+
+$form = $this->createForm(TrickType::class, $trick);
+
+        // remplit les champs du formulaires si une trick a été trouvée dans la request
+        $form->handleRequest($request);
+
+        // si le formulaire a été soumis et validé
+        if ($form->isSubmitted() && $form->isValid()) {
+            // ajouter date de création, history...
+
+            // manager->persist, flush...
+
+            // return $this->redirectToRoute('app...', ['id' => $trick->getId()])
+        }
+
+        $twigParams['trickForm'] = $form->createView();
+        $twigParams['title'] = "Créer une figure";
+        $twigParams['formTitle'] = "Créer une nouvelle figure";
+        $twigParams['pageTitle'] = "Créer une nouvelle figure";
+        $twigParams['pageSubTitle'] = "";
+        
+        return $this->render('pages/tricks/trickForm.html.twig', $twigParams);
+        
+        // return $this->redirectToRoute('app_trick_show', ['id' => $trick->getId()]);
+    }
+
+
+    /**
+     * @Route("/editTrick/{id}", name="app_trick_edit")
+     */
+    public function editTrick(Trick $trick)
+    {
+        // TODO
+    }
+
+    /**
+     * @Route("/deleteTrick/{id}", name="app_trick_delete")
+     */
+    public function deleteTrick(Trick $trick)
+    {
+        // TODO
+    }
+
 
 }

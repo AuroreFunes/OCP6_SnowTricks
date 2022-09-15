@@ -4,6 +4,7 @@ namespace App\Service\Trick;
 
 use App\Service\ServiceHelper;
 use App\Repository\TrickRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
 class LoadTricksService extends ServiceHelper
 {
@@ -15,9 +16,9 @@ class LoadTricksService extends ServiceHelper
     // PRIVATE USE
     private TrickRepository $trickRepository;
 
-    public function __construct(TrickRepository $trickRepository)
+    public function __construct(ManagerRegistry $manager, TrickRepository $trickRepository)
     {
-        parent::__construct();
+        parent::__construct($manager);
 
         $this->trickRepository = $trickRepository;
     }

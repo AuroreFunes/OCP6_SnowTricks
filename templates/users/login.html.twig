@@ -1,0 +1,47 @@
+{% extends 'commons/base.html.twig' %}
+
+{% set formTitle = "Connexion" %}
+{% set pageTitle = "Connexion" %}
+{% set pageSubTitle = "Bon retour parmi nous" %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block style %}
+header.masthead { 
+    background: url("{{ asset('img/contact-bg.jpg') }}") center no-repeat !important;
+}
+
+.btn-center {
+    text-align: center;
+}
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-4">
+        {% if error is not empty %}
+        <div class="alert alert-danger">
+            {{ error.messageKey|trans(error.messageData, 'security') }}
+        </div>
+        {% endif %}
+
+        <form action="{{ path('app_user_login') }}" method="post">
+            <div class="form-group mb-3">
+                <label for="username">Nom d'utilisateur</label>
+                <input type="text" name="_username" id="username" class="form-control" 
+                    placeholder="Nom d'utilisateur" value="{{ lastUsername }}" required />
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="pwd">Mot de passe</label>
+                <input type="password" name="_password" id="pwd" class="form-control" 
+                    placeholder="Mot de passe" required />
+            </div>
+
+            <div class="form-group mb-3 btn-center">
+                <input type="submit" value="Se connecter" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

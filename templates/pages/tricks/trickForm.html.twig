@@ -1,0 +1,37 @@
+{% extends 'commons/base.html.twig' %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+    {% form_theme trickForm 'bootstrap_4_layout.html.twig' %}
+    {{ form_start(trickForm) }}
+
+    {#  {{ form_widget(trickForm) }}  #}
+
+    {{ form_row(trickForm.name, {
+        'label': "Nom de la figure",
+        'attr': {
+            'placeholder': "Nom de la figure"
+        }})
+    }}
+    
+    {{ form_row(trickForm.description, {
+        'label': "Description de la figure",
+        'attr': {
+            'placeholder': "Description de la figure"
+        }})
+    }}
+
+    {{ form_row(trickForm.group, {
+        'label': "Groupe de la figure",
+        'attr': {
+            'placeholder': "Groupe de la figure"
+        }})
+    }}
+
+    <input type="submit" value="envoyer" />
+
+
+    {# On peut ajouter le bouton submit manuellement en ajoutant la balise html correspondante #}
+
+    {{ form_end(trickForm)}}
+{% endblock %}

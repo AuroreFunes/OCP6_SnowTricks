@@ -28,17 +28,23 @@
         min-width: 85px;
         text-align: right;
     }
+    .btn-center {
+        text-align: center;
+        justify-content: center;
+    }
 {% endblock %}
 
 {% block content %}
+
     <div class="row">
         <div id="gallery" class="gallery">
             {% include 'pages/tricks/trickElement.html.twig' %}
         </div>
     </div>
 
-    <div class="row mb-3">
-        <button type="button" class="btn btn-primary" id="loadMore" page="1">Charger plus</button>
+    <div class="row mb-3 mt-3 btn-center">
+        <button type="button" class="btn btn-primary" id="loadMore" page="1"
+            style="max-width: 200px;">Charger plus</button>
     </div>
 
 <!-- Modal -->
@@ -66,7 +72,6 @@
 
 {% block javaScript %}
 <script type="text/javascript">
-
 
     $(document).ready(function() {
         
@@ -114,4 +119,3 @@
 
 </script>
 {% endblock %}
-

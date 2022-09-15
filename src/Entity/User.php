@@ -6,11 +6,25 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
+ * @UniqueEntity(
+ *  fields={"email"},
+ *  message="Cette adresse e-mail est déjà utilisée."
+ * )
+ * @UniqueEntity(
+ *  fields={"username"},
+ *  message="Ce nom d'utilisateur est déjà utilisé."
+ * )
  */
-class User
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     /**
      * @ORM\Id
@@ -20,19 +34,62 @@ class User
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=100)
+     * @Assert\NotBlank(
+     *      message = "Vous devez choisir un nom d'utilisateur."
+     * )
+     * @Assert\Length(
+     *      min = 3,
+     *      max = 50,
+     *      minMessage = "Le nom d'utilisateur doit comporter entre 3 et 50 caractères.",
+     *      maxMessage = "Le nom d'utilisateur doit comporter entre 3 et 50 caractères."
+     * )
      */
     private $username;
 
     /**
      * @ORM\Column(type="string", length=255)
+     *  @Assert\NotBlank(
+     *      message = "Vous devez entrer votre adresse e-mail."
+     * )
+     * @Assert\Email(
+     *      message = "L'adresse e-mail n'est pas valide."
+     * )
+     * @Assert\Length(
+     *      max = 254,
+     *      maxMessage = "L'adresse email ne peut pas contenir plus de {{ limit }} caractères."
+     * )
      */
     private $email;
 
     /**
+     * @var string The hashed password
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(
+     *      message = "Vous devez choisir un mot de passe."
+     * )
+     * @Assert\Length(
+     *      min="8",
+     *      max="254",
+     *      minMessage="Le mot de passe doit faire entre 8 et 254 caractères.",
+     *      maxMessage="Le mot de passe doit faire entre 8 et 254 caractères."
+     * )
+     * @Assert\Regex(
+     *     pattern = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])^",
+     *     match = true,
+     *     message = "Le mot de passe doit contenir au moins une minuscule, une majuscule et un chiffre."
+     * )
      */
     private $password;
+
+    /**
+     * @var string "password_confirm" is not in database, it's only use in registration form
+     * @Assert\EqualTo(
+     *      propertyPath="password_confirm",
+     *      message="Les mots de passe doivent être identiques."
+     * )
+     */
+    private $password_confirm;
 
     /**
      * @ORM\Column(type="boolean")
@@ -69,10 +126,15 @@ class User
      */
     private $trickHistories;
 
+    // not necessary on our database because we have only "user role" and any admin role
+    private $roles = [];
+
     public function __construct()
     {
         $this->trickComments = new ArrayCollection();
         $this->trickHistories = new ArrayCollection();
+
+        $this->roles[] = 'ROLE_USER';
     }
 
     public function getId(): ?int
@@ -240,4 +302,46 @@ class User
 
         return $this;
     }
+
+    // "password_confirm" is not in database, it's only use in registration form
+    public function getPasswordConfirm(): ?string
+    {
+        return $this->password_confirm;
+    }
+
+    public function setPasswordConfirm(?string $password_confirm): self
+    {
+        $this->password_confirm = $password_confirm;
+
+        return $this;
+    }
+
+
+    // ============================================================================================
+    // USER INTERFACE
+    // ============================================================================================
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;
+    }
+
+    public function getRoles(): array
+    {
+        if (empty($this->roles)) {
+            return ['ROSE_USER'];
+        }
+
+        return array_unique($this->roles);
+    }
+    
+    public function eraseCredentials()
+    {
+        
+    }
+
+    public function getSalt() : ?string
+    {
+        return null;
+    }
+
 }

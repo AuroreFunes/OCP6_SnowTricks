@@ -2,9 +2,13 @@
 
 namespace App\Service;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Persistence\ObjectManager;
 
 abstract class ServiceHelper {
+
+    protected ObjectManager $manager;
 
     // UTILITIES
     protected bool $status;
@@ -15,7 +19,9 @@ abstract class ServiceHelper {
     // ERRORS
     protected const ERR_DB_ACCESS = "Une erreur interne s'est produite.";
 
-    public function __construct() {
+    public function __construct(ManagerRegistry $manager) {
+        $this->manager = $manager->getManager();
+
         $this->status = false;
         $this->functArgs = new ArrayCollection();
         $this->functResult = new ArrayCollection();

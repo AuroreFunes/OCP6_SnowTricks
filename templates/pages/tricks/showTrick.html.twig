@@ -9,6 +9,10 @@ header.masthead {
     display: none;
 }
 
+.row {
+    padding: none !important;
+}
+
 article header.masthead {
     background: white url("{{ asset('img/tricks/') }}{{ trick.defaultImage.path }}") center no-repeat !important; 
 }
@@ -107,6 +111,27 @@ article .site-heading {
             <div>Date de création : {{ trick.createdAt | date('d/m/Y à h:m') }}</div>
             {% if trick.createdAt != trick.updatedAt %}
                 <div>Dernière modification : {{ trick.updatedAt | date('d/m/Y à h:m') }}</div>
+            {% endif %}
+        </section>
+
+        <!-- comment form -->
+        <section>
+            {% if not app.user %}
+                Vous devez être connecté pour ajouter un commentaire.
+            {% else %}
+                {% form_theme commentForm 'bootstrap_4_layout.html.twig' %}
+                {{ form_start(commentForm) }}
+
+                    {{ form_row(commentForm.content, {
+                        'label': "Votre commentaire",
+                        'attr': {
+                            'placeholder': "Votre commentaire"
+                        }})
+                    }}
+
+                    <input type="submit" value="Publier" />
+
+                {{ form_end(commentForm) }}
             {% endif %}
         </section>
     </article>

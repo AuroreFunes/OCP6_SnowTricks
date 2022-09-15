@@ -8,6 +8,7 @@ use App\Entity\TrickHistory;
 use App\Entity\TrickImage;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 use App\Entity\User;
 
@@ -15,15 +16,16 @@ class AllFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
-        // $product = new Product();
-        // $manager->persist($product);
-
         // ========================================================================================
         // USER
         // ========================================================================================
         $user = new User();
         $user->setUsername('Admin');
         $user->setEmail('admin@mysitetest.com');
+
+        //$passwordHasher = new UserPasswordHasherInterface();
+        //$user->setPassword($passwordHasher->hashPassword($user, '123@dmin!'));
+
         $user->setPassword(password_hash('123@dmin!', PASSWORD_DEFAULT));
         $user->setCreatedAt(new \DateTime());
         $user->setIsActive(true);
