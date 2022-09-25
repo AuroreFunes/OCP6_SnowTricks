@@ -17,14 +17,17 @@ header.masthead {
 {% endblock %}
 
 {% block content %}
+
+{% if error is defined %}
+    <div class="row">
+        <p class="alert alert-danger">
+            {{ error }}
+        </p>
+    </div>
+{% endif %}
+
 <div class="row justify-content-center">
     <div class="col-4">
-        {% if error is not empty %}
-        <div class="alert alert-danger">
-            {{ error.messageKey|trans(error.messageData, 'security') }}
-        </div>
-        {% endif %}
-
         <form action="{{ path('app_user_login') }}" method="post">
             <div class="form-group mb-3">
                 <label for="username">Nom d'utilisateur</label>
@@ -42,6 +45,11 @@ header.masthead {
                 <input type="submit" value="Se connecter" class="btn btn-primary" />
             </div>
         </form>
+
+        <div class="row text-center mb-3">
+            <a href="{{path('app_user_forgottenPassword') }}">Mot de passe oublié ?</a>
+        </div>
     </div>
+
 </div>
 {% endblock %}

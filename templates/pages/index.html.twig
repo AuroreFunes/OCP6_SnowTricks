@@ -35,7 +35,6 @@
 {% endblock %}
 
 {% block content %}
-
     <div class="row">
         <div id="gallery" class="gallery">
             {% include 'pages/tricks/trickElement.html.twig' %}
@@ -48,6 +47,7 @@
     </div>
 
 <!-- Modal -->
+{% if app.user %}
 <div class="modal fade" id="deleteTrickModal" tabindex="-1" aria-labelledby="deleteTrickModalLabel" 
     aria-hidden="true">
   <div class="modal-dialog">
@@ -67,6 +67,7 @@
     </div>
   </div>
 </div>
+{% endif %}
 
 {% endblock %}
 

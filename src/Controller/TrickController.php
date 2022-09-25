@@ -42,6 +42,7 @@ class TrickController extends AbstractController
         $twigParams['pageTitle'] = "";
         $twigParams['pageSubTitle'] = "";
         $twigParams['trick'] = $trick;
+        
         $comment = new TrickComment();
         $twigParams['commentForm'] = $this->createForm(TrickCommentType::class, $comment)->createView();
 
@@ -55,7 +56,7 @@ class TrickController extends AbstractController
     {
         $params = $request->request->all();
 
-        $service->loadTricks(self::TRICKS_PER_PAGE, $params);
+        $service->loadTricks($_ENV['TRICKS_PER_PAGE'], $params);
 
         if (false === $service->getStatus()) {
             return new JsonResponse("Aucune donnée n'a pu être obtenue.", 
@@ -134,6 +135,20 @@ $form = $this->createForm(TrickType::class, $trick);
     public function deleteTrick(Trick $trick)
     {
         // TODO
+    }
+
+    /**
+     * @Route("/commentTrick/{id}", name="app_trick_addComment")
+     */
+    public function addTrickComment(Trick $trick)
+    {
+        /** @var User $user */
+        if (null === $user = $this->getUser()) {
+            $this->addFlash('error', "Vous devez être connecté pour ajouter un commentaire !");
+            return $this->redirectToRoute('app_user_login');
+        }
+
+
     }
 
 

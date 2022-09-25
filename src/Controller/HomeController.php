@@ -2,16 +2,11 @@
 
 namespace App\Controller;
 
-use App\Entity\Trick;
-use App\Repository\TrickRepository;
 use App\Service\Trick\LoadTricksService;
-
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-
-use function Symfony\Component\DependencyInjection\Loader\Configurator\env;
 
 class HomeController extends AbstractController
 {
@@ -25,7 +20,7 @@ class HomeController extends AbstractController
         $params['session'] = $request->request->all();
 
         //$service->loadTricks(getenv('TRICKS_PER_PAGE'));
-        $service->loadTricks(4);
+        $service->loadTricks($_ENV['TRICKS_PER_PAGE']);
 
         if (false === $service->getStatus()) {
             $twigParams['pageTitle'] = "Oups !";

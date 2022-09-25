@@ -22,10 +22,15 @@ abstract class ServiceHelper {
     public function __construct(ManagerRegistry $manager) {
         $this->manager = $manager->getManager();
 
-        $this->status = false;
-        $this->functArgs = new ArrayCollection();
-        $this->functResult = new ArrayCollection();
-        $this->errMessages = new ArrayCollection();
+        $this->initHelper();
+    }
+
+    protected function initHelper(): void
+    {
+        $this->status   = false;
+        $this->functArgs    = new ArrayCollection();
+        $this->functResult  = new ArrayCollection();
+        $this->errMessages  = new ArrayCollection();
     }
 
     public function getStatus()

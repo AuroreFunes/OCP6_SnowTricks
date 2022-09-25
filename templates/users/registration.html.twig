@@ -21,54 +21,55 @@ header.masthead {
 {% endblock %}
 
 {% block content %}
+
 <div class="row justify-content-center">
     <div class="col-4">
 
-    {% form_theme registrationForm 'bootstrap_4_layout.html.twig' %}
-    {{ form_start(registrationForm) }}
+        {% form_theme registrationForm 'bootstrap_4_layout.html.twig' %}
+        {{ form_start(registrationForm) }}
 
-    {# {{ form_widget(registrationForm) }} #}
+        {# {{ form_widget(registrationForm) }} #}
 
-    {{ form_row(registrationForm.username, {
-        'label': "Nom d'utilisateur",
-        'attr': {
-            'placeholder': "Votre nom d'utilisateur"
-        }})
-    }}
+        {{ form_row(registrationForm.username, {
+            'label': "Nom d'utilisateur",
+            'attr': {
+                'placeholder': "Votre nom d'utilisateur"
+            }})
+        }}
 
-    {{ form_row(registrationForm.email, {
-        'label': "E-mail",
-        'attr': {
-            'placeholder': "Votre e-mail"
-        }})
-    }}
+        {{ form_row(registrationForm.email, {
+            'label': "E-mail",
+            'attr': {
+                'placeholder': "Votre e-mail"
+            }})
+        }}
 
-    {{ form_row(registrationForm.password, {
-        'label': "Mot de passe",
-        'attr': {
-            'placeholder': "Votre mot de passe"
-        }})
-    }}
+        {{ form_row(registrationForm.password, {
+            'label': "Mot de passe",
+            'attr': {
+                'placeholder': "Votre mot de passe"
+            }})
+        }}
 
-    {{ form_row(registrationForm.password_confirm, {
-        'label': "Confirmation du mot de passe",
-        'attr': {
-            'placeholder': "Répétez votre mot de passe"
-        }})
-    }}
+        {{ form_row(registrationForm.password_confirm, {
+            'label': "Confirmation du mot de passe",
+            'attr': {
+                'placeholder': "Répétez votre mot de passe"
+            }})
+        }}
 
-    {{ form_row(registrationForm.profilePicture, {
-        'label': "Image de profil",
-        'attr': {
-            'placeholder': "Image de profil"
-        }})
-    }}
+        {{ form_row(registrationForm.profilePicture, {
+            'label': "Image de profil",
+            'attr': {
+                'placeholder': "Image de profil"
+            }})
+        }}
 
-    <div class="form-group btn-center">
-        <input type="submit" value="S'inscrire" class="btn btn-primary" />
-    </div>
+        <div class="form-group btn-center">
+            <input type="submit" value="S'inscrire" class="btn btn-primary" />
+        </div>
 
-    {{ form_end(registrationForm)}}
+        {{ form_end(registrationForm)}}
     </div>
 </div>
 {% endblock %}

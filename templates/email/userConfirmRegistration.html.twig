@@ -1,0 +1,21 @@
+<html>
+    <body>
+        <h1>Bienvenue sur SnowTricks, {{ username }} !</h1>
+
+        <p>
+            Pour valider votre e-mail et activer votre compte, merci de cliquer sur le lien ci-dessous.
+        </p>
+
+        <p>
+            <a href="{{ fullPath }}">{{ fullPath }}</a>
+        {# 
+            <a href="{{ path('app_user_confirmRegistration', { id : id, token : token }) }}">
+                {{ path('app_user_confirmRegistration', { id : id, token : token }) }}</a>
+            #}
+        </p>
+
+        <p>
+            A bientôt sur SnowTricks !
+        </p>
+    </body>
+</html>

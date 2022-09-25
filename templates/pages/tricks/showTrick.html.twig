@@ -67,8 +67,10 @@ article .site-heading {
     <article class="trick-content">
         <header class="masthead">
             <div class="trick-btn">
-                <button type="button" class="btn btn-sm"><i class="bi bi-pencil-fill"></i></button>
-                <button type="button" class="btn btn-sm"><i class="bi bi-trash3-fill"></i></button>
+                {% if app.user %}
+                    <button type="button" class="btn btn-sm"><i class="bi bi-pencil-fill"></i></button>
+                    <button type="button" class="btn btn-sm"><i class="bi bi-trash3-fill"></i></button>
+                {% endif %}
             </div>
 
             <div class="container position-relative px-4 px-lg-5">
@@ -115,24 +117,40 @@ article .site-heading {
         </section>
 
         <!-- comment form -->
-        <section>
-            {% if not app.user %}
-                Vous devez être connecté pour ajouter un commentaire.
-            {% else %}
-                {% form_theme commentForm 'bootstrap_4_layout.html.twig' %}
-                {{ form_start(commentForm) }}
+        <div class="row justify-content-center">
+            <section class="col-8">
+                <hr />
+                {% if not app.user %}
+                    Vous devez être connecté pour ajouter un commentaire.
+                {% else %}
+                    {% form_theme commentForm 'bootstrap_4_layout.html.twig' %}
+                    {{ form_start(commentForm) }}
 
-                    {{ form_row(commentForm.content, {
-                        'label': "Votre commentaire",
-                        'attr': {
-                            'placeholder': "Votre commentaire"
-                        }})
-                    }}
+                        {{ form_row(commentForm.content, {
+                            'label': "Votre commentaire",
+                            'attr': {
+                                'placeholder': "Votre commentaire"
+                            }})
+                        }}
 
-                    <input type="submit" value="Publier" />
+                        <div class="form-group btn-center mt-3">
+                            <input type="submit" value="Publier" class="btn btn-primary" />
+                        </div>
+                    {{ form_end(commentForm) }}
+                {% endif %}
 
-                {{ form_end(commentForm) }}
-            {% endif %}
-        </section>
+                <hr />
+
+                {% if trick.comments is not empty %}
+                    {% for comment in trick.comments %}
+                        
+                    {% endfor %}
+                {% else %}
+                    <p class="text-secondary">
+                        Il n'y a pas encore de commentaire.
+                    </p>
+                {% endif %}
+            </section>
+        </div>
     </article>
 {% endblock %}
