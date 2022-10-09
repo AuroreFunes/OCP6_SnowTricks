@@ -1,0 +1,15 @@
+<div class="comment container mb-3">
+    <div class="row row-cols-auto">
+        <div class="col commentUserImg">
+            <img src="{{ asset('img/users/') }}{{ comment.author.profilePicture }}" />
+        </div>
+        <div class="col commentContent">
+            <p class="text-muted mb-1">
+                <strong class="text-success">{{ comment.author.username }}</strong>
+                <small class="text-muted"> le {{ comment.created | date('d/m/Y H:m:i') }}</small>
+            </p>
+            <p>{{ comment.content }}</p>
+        </div>
+    </div>
+</div>
+<hr />

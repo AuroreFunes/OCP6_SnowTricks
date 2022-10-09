@@ -7,16 +7,20 @@
 {% block title %}Connexion{% endblock %}
 
 {% block style %}
-header.masthead { 
-    background: url("{{ asset('img/contact-bg.jpg') }}") center no-repeat !important;
-}
+    <style type="text/css">
+        header.masthead { 
+            background: url("{{ asset('img/contact-bg.jpg') }}") center no-repeat !important;
+        }
 
-.btn-center {
-    text-align: center;
-}
+        .btn-center {
+            text-align: center;
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
+
+{% include 'commons/flashMessages.html.twig' %}
 
 {% if error is defined %}
     <div class="row">

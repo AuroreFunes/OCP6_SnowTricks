@@ -47,6 +47,7 @@ class Trick
 
     /**
      * @ORM\OneToMany(targetEntity=TrickComment::class, mappedBy="trick", orphanRemoval=true, cascade={"persist", "remove"})
+     * @ORM\OrderBy({"createdAt" = "DESC"})
      */
     private $trickComments;
 

@@ -55,18 +55,23 @@ class UserAskNewPasswordService extends SendMailServiceHelper
     // ============================================================================================
     protected function sendMail()
     {
+        // create a new token ...
         /** @var UserToken $token */
         $token = $this->tokenManager->createToken($this->functResult->get('user'));
+        
+        // ... and add it to the user
+        $user = $this->functResult->get('user')->addToken($token);
 
+        // then save user and token
         try {
-            $this->manager->persist($token);
+            $this->manager->persist($user);
             $this->manager->flush();
         } catch (\Exception $e) {
-            $this->errMessages->add("Erreur interne : " . $e);
+            $this->errMessages->add(self::ERR_INTERNAL_ERROR);
             return false;
         }
 
-        $path = "test" . "/" . $this->functResult->get('user')->getId() . "/" . $token->getToken();
+        $path = $this->functResult->get('user')->getId() . "/" . $token->getToken();
 
         $message = (new Email())
             ->from($_ENV['ADMIN_EMAIL'])
@@ -74,7 +79,8 @@ class UserAskNewPasswordService extends SendMailServiceHelper
             ->subject('Réinitialisation de votre mot de passe')
             ->html($this->twig->render('email/userForgottenPassword.html.twig', [
                     'username' => $this->functResult->get('user')->getUsername(),
-                    'fullPath' => $path
+                    'base_url' => $_ENV['SITE_BASE_URL'],
+                    'path' => $path
                 ]),
             );
 

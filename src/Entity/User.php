@@ -12,6 +12,8 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
+use App\Entity\UserToken;
+
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
@@ -66,7 +68,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank(
-     *      message = "Vous devez choisir un mot de passe."
+     *      message = "Vous devez choisir un mot de passe.",
+     *      groups={"PasswordForm"}
      * )
      * @Assert\Length(
      *      min="8",
@@ -86,7 +89,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string "password_confirm" is not in database, it's only use in registration form
      * @Assert\EqualTo(
      *      propertyPath="password_confirm",
-     *      message="Les mots de passe doivent être identiques."
+     *      message="Les mots de passe doivent être identiques.",
+     *      groups={"PasswordForm"}
      * )
      */
     private $password_confirm;
@@ -112,9 +116,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $updatedAt;
 
     /**
-     * @ORM\OneToOne(targetEntity=UserToken::class, mappedBy="user", cascade={"persist", "remove"})
+     * @ORM\OneToMany(targetEntity=UserToken::class, mappedBy="user", orphanRemoval=true, cascade={"persist", "remove"})
+     * ORM\OrderBy({"createdAt" = "DESC"})
      */
-    private $userToken;
+    private $userTokens;
 
     /**
      * @ORM\OneToMany(targetEntity=TrickComment::class, mappedBy="user", orphanRemoval=true)
@@ -192,6 +197,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getProfilePicture(): ?string
     {
+        if (empty($this->profilePicture)) {
+            return "default.jpg";
+        }
         return $this->profilePicture;
     }
 
@@ -226,19 +234,48 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getUserToken(): ?UserToken
+    /** 
+     *  @return Collection<int, UserToken>
+    */
+    public function getTokens(): Collection
     {
-        return $this->userToken;
+        return $this->userTokens;
     }
 
-    public function setUserToken(UserToken $userToken): self
+    public function getUserToken(): ?UserToken
     {
-        // set the owning side of the relation if necessary
-        if ($userToken->getUser() !== $this) {
-            $userToken->setUser($this);
+        if (empty($this->userTokens)) {
+            return null;
+        }
+        
+        return $this->userTokens[0];
+    }
+
+    public function addToken(UserToken $token): self
+    {
+        if (empty($this->userTokens)) {
+            $this->userTokens[] = $token;
+            $token->setUser($this);
+
+            return $this;
+        }
+        
+        if (!$this->userTokens->contains($token)) {
+            $this->userTokens[] = $token;
+            $token->setUser($this);
         }
 
-        $this->userToken = $userToken;
+        return $this;
+    }
+
+    public function removeToken(UserToken $token): self
+    {
+        if ($this->userTokens->removeElement($token)) {
+            // set the owning side to null (unless already changed)
+            if ($token->getUser() === $this) {
+                $token->setUser(null);
+            }
+        }
 
         return $this;
     }

@@ -41,15 +41,13 @@ class UserRegistrationService extends ServiceHelper
 
         // create token
         if (null === $token = $this->tokenManager->createToken($user)) {
-            $this->errMessages->add(self::INTERNAL_ERROR);
+            $this->errMessages->add(self::INTERNAL_ERROR);dd("erreur ici");
             return $this;
         }
 
-        $user->setUserToken($token);
-
         // save user and token
         try {
-            $this->manager->persist($token);
+            $this->manager->persist($user);
             $this->manager->flush();
         } catch (\Exception $e) {
             $this->errMessages->add(self::INTERNAL_ERROR);

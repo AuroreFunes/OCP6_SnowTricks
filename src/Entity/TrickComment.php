@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\TrickCommentRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=TrickCommentRepository::class)
@@ -36,6 +37,10 @@ class TrickComment
 
     /**
      * @ORM\Column(type="text")
+     * @Assert\Length(
+     *      min="5",
+     *      minMessage="Le commentaire ne peut pas faire moins de 5 caractères."
+     * )
      */
     private $content;
 

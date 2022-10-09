@@ -2,39 +2,43 @@
 {% block title %}SnowTricks{% endblock %}
 
 {% block style %}
-    header.masthead { 
-        background: url("{{ asset('img/home-bg.jpg') }}") center no-repeat !important; 
-    }
+    <style type="text/css">
+        header.masthead { 
+            background: url("{{ asset('img/home-bg.jpg') }}") center no-repeat !important; 
+        }
 
-    .gallery {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content : space-around;
-    }
-    .gallery figure {
-        border: solid 1px black;
-        margin: 10px;
-        max-width: 250px;
-    }
-    .gallery-infos {
-        padding: 5px;
-        display: flex;
-        flex-wrap: nowrap;
-    }
-    .gallery-title {
-        width: 100%;
-    }
-    .gallery-btn {
-        min-width: 85px;
-        text-align: right;
-    }
-    .btn-center {
-        text-align: center;
-        justify-content: center;
-    }
+        .gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content : space-around;
+        }
+        .gallery figure {
+            border: solid 1px black;
+            margin: 10px;
+            max-width: 250px;
+        }
+        .gallery-infos {
+            padding: 5px;
+            display: flex;
+            flex-wrap: nowrap;
+        }
+        .gallery-title {
+            width: 100%;
+        }
+        .gallery-btn {
+            min-width: 85px;
+            text-align: right;
+        }
+        .btn-center {
+            text-align: center;
+            justify-content: center;
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
+    {% include 'commons/flashMessages.html.twig' %}
+
     <div class="row">
         <div id="gallery" class="gallery">
             {% include 'pages/tricks/trickElement.html.twig' %}

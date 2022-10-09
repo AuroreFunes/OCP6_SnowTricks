@@ -17,31 +17,31 @@ class UserTokenManagement
 
     public function createToken(User $user): ?UserToken
     {
-        
         // delete old token
         if (null !== $oldToken = $user->getUserToken()) {
-            //dd("test", $oldToken, $user->getUserToken()); => ok
             try {
-               $this->manager->remove($oldToken);   // erreur : "Notice: Undefined index: user"
-               dd("test");
+               $this->manager->remove($oldToken);
                $this->manager->flush();
-
-               dd($oldToken, $user->getUserToken());
             } catch (\Exception $e) {
-                dd("erreur token : ", $e, $oldToken->getUser(), $oldToken);
                 return null;
             }
-            
-dd("token ok");
         }
 
         // create new token
         $token = new UserToken();
         $token->setCreated(new \DateTime());
         $token->setToken(bin2hex(openssl_random_pseudo_bytes(25)));
-        $token->setUser($user);
+        //$token->setUser($user);
+        $user->addToken($token);
 
-        // return token content
+        // save token
+        try {
+            $this->manager->persist($token);
+        } catch (\Exception $e) {
+            return null;
+        }
+
+        // return token
         return $token;
     }
     

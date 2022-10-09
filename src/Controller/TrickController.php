@@ -2,12 +2,13 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Entity\Trick;
 use App\Entity\TrickComment;
 use App\Form\TrickType;
 
 use App\Form\TrickCommentType;
-
+use App\Service\Trick\AddTrickCommentService;
 use App\Service\Trick\LoadTricksService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -20,32 +21,44 @@ use function Symfony\Component\DependencyInjection\Loader\Configurator\env;
 class TrickController extends AbstractController
 {
 
-    const TRICKS_PER_PAGE = 4;
-
     /**
      * @Route("/showTrick/{id}", name="app_trick_show")
      */
-    public function showTrick(Trick $trick = null)
+    public function showTrick(Trick $trick = null, Request $request, AddTrickCommentService $service)
     {
         $twigParams = [];
 
         if (null === $trick) {
-            $twigParams['title'] = "Erreur";
-            $twigParams['pageTitle'] = "Erreur";
-            $twigParams['pageSubTitle'] = "La demande n'a pas pu aboutir";
-            $twigParams['messages'] = ["La figure demandée n'existe pas ou n'a pas été trouvée."];
-            $twigParams['back'] = "";
-
-            return $this->render('pages/genericMessagePage.html.twig', $twigParams);
+            $this->addFlash('error', "La figure à laquelle vous essayez d'accéder n'existe pas ou a été supprimée.");
+            return $this->redirectToRoute('app_home');
         }
 
-        $twigParams['pageTitle'] = "";
-        $twigParams['pageSubTitle'] = "";
         $twigParams['trick'] = $trick;
         
         $comment = new TrickComment();
-        $twigParams['commentForm'] = $this->createForm(TrickCommentType::class, $comment)->createView();
+        $form = $this->createForm(TrickCommentType::class, $comment);
+        $form->handleRequest($request);
 
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var ?User $user */
+            if (null === $user = $this->getUser()) {
+                $this->addFlash('error', "Vous devez être connecté pour ajouter un commentaire !");
+                return $this->redirectToRoute('app_trick_show', ['id' => $trick->getId()]);
+            }
+
+            // add the new comment
+            $service->addComment($comment, $trick, $user);
+
+            if (false === $service->getStatus()) {
+                $this->addFlash('error', "Une erreur interne s'est produite. Merci de réessayer plus tard.");
+                return $this->redirectToRoute('app_trick_show', ['id' => $trick->getId()]);
+            }
+
+            $this->addFlash('success', "Votre commentaire a bien été ajouté.");
+            return $this->redirectToRoute('app_trick_show', ['id' => $trick->getId()]);
+        }
+
+        $twigParams['commentForm'] = $form->createView();
         return $this->render('pages/tricks/showTrick.html.twig', $twigParams);
     }
 
@@ -68,7 +81,7 @@ class TrickController extends AbstractController
                 'pages/tricks/trickElement.html.twig', 
                 ['tricks' => $service->getResult()['tricks']]
             )->getContent();
-        $data['moreTricks'] = self::TRICKS_PER_PAGE > $service->getResult()['tricksNb'] ? false : true;
+        $data['moreTricks'] = $_ENV['TRICKS_PER_PAGE'] > $service->getResult()['tricksNb'] ? false : true;
 
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');

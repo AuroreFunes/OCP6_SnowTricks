@@ -34,6 +34,10 @@ class UserConfirmRegistrationService extends ServiceHelper
             return $this;
         }
 
+        if (false === $this->makeActivation()) {
+            return $this;
+        }
+
         $this->status = true;
         return $this;
     }
@@ -45,13 +49,14 @@ class UserConfirmRegistrationService extends ServiceHelper
     {
         // activate user account
         $this->functArgs->get('user')->setIsActive(true);
+        
         try {
             // remove used token
             $this->manager->remove($this->functArgs->get('user')->getUserToken());
             $this->manager->persist($this->functArgs->get('user'));
             $this->manager->flush();
         } catch (\Exception $e) {
-            $this->errMessages->add("Erreur interne : " . $e);
+            $this->errMessages->add("Erreur interne : " . $e->getMessage());
             return false;
         }
         

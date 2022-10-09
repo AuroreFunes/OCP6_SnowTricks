@@ -29,9 +29,8 @@
                 background: rgba(0, 0, 0, 0.3);
                 display: none;
             }
-
-            {% block style %}{% endblock %}
         </style>
+        {% block style %}{% endblock %}
     </head>
     <body>
         <!-- UpLayer-->
@@ -46,29 +45,9 @@
         <!-- Main Content-->
         <div class="container">
 
-            <!-- Flash Messages -->
-            <div class="row" id="flashMessages">
-                {% for message in app.flashes('success') %}
-                    <div class="alert alert-success">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-
-                {% for message in app.flashes('error') %}
-                    <div class="alert alert-danger">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-
-                {% for message in app.flashes('warning') %}
-                    <div class="alert alert-warning">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            </div>
-
             <!-- Body Content -->
             {% block content %}{% endblock %}
+            
         </div>
         
         <!-- Footer-->

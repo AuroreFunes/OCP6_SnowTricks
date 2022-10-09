@@ -8,6 +8,8 @@ use Twig\Loader\FilesystemLoader;
 
 abstract class SendMailServiceHelper extends ServiceHelper {
 
+    protected const ERR_INTERNAL_ERROR = "Une erreur interne s'est produite.";
+
     protected Environment $twig;
 
     protected function __construct(ManagerRegistry $manager)

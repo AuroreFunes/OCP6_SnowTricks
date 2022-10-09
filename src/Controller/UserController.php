@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\RegistrationType;
 use App\Form\UserForgottenPasswordType;
+use App\Form\UserResetPasswordType;
 use App\Service\User\SendActivationMailService;
 use App\Service\User\UpdateUserPictureService;
 use App\Service\User\UserAskNewPasswordService;
@@ -18,7 +19,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 use App\Service\User\UserRegistrationService;
-
+use App\Service\User\UserResetPasswordService;
 
 class UserController extends AbstractController
 {
@@ -136,7 +137,6 @@ class UserController extends AbstractController
      */
     public function askNewPassword(Request $request, UserAskNewPasswordService $service)
     {
-
         $form = $this->createForm(UserForgottenPasswordType::class);
         $form->handleRequest($request);
 
@@ -144,7 +144,7 @@ class UserController extends AbstractController
 
             $service->sendToken($form->getData()['email']);
 
-            if (false === $service->getStatus()) {
+            if (false === $service->getStatus()) {dd($service->getErrorsMessages());
                 $this->addFlash('error', "Une erreur s'est produite.
                     Merci de réessayer dans quelques instants.");
                 return $this->redirectToRoute('app_home');
@@ -157,6 +157,46 @@ class UserController extends AbstractController
 
         $twigParams['forgottenPasswordForm'] = $form->createView();
         return $this->render('users/forgottenPassword.html.twig', $twigParams);
+    }
+
+    /**
+     * @Route("/setPassword/{id}/{token}", name="app_user_setNewPassword")
+     */
+    public function setNewPassword(
+        ?User $user, 
+        string $token, 
+        Request $request, 
+        UserResetPasswordService $service
+    )
+    {
+        // the user must not already be logged in
+        if (null !== $this->getUser()) {
+            $this->addFlash('error', "Impossible d'utiliser cette fonctionnalité pour le moment.");
+            return $this->redirectToRoute('app_home');
+        }
+
+        $form = $this->createForm(UserResetPasswordType::class);
+        $form->handleRequest($request);
+        
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $service->resetPassword($user, $token, $request->request->all()['user_reset_password']);
+
+            // success
+            if (true === $service->getStatus()) {
+                $this->addFlash('success', "Votre mot de passe a bien été réinitialisé. 
+                    Vous pouvez maintenant vous connecter avec ce dernier.");
+                return $this->redirectToRoute('app_user_login');
+            }
+
+            // error
+            foreach ($service->getErrorsMessages() as $error) {
+                $this->addFlash('error', $error);
+            }
+        }
+
+        $twigParams['resetPasswordForm'] = $form->createView();
+        return $this->render('users/resetPassword.html.twig', $twigParams);
     }
 
 }

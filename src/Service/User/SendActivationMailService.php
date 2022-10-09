@@ -55,7 +55,8 @@ class SendActivationMailService extends SendMailServiceHelper
     protected function createMail()
     {
 
-        $path = "test" . "/" . $this->functArgs->get('user')->getId() . "/" . $this->functArgs->get('user')->getUserToken()->getToken();
+        $path = $this->functArgs->get('user')->getId() . "/" . 
+            $this->functArgs->get('user')->getUserToken()->getToken();
 
         $message = (new Email())
             ->from($_ENV['ADMIN_EMAIL'])
@@ -63,22 +64,10 @@ class SendActivationMailService extends SendMailServiceHelper
             ->subject('Confirmation de votre inscription')
             ->html($this->twig->render('email/userConfirmRegistration.html.twig', [
                     'username' => $this->functArgs->get('user')->getUsername(),
-                    'fullPath' => $path
+                    'base_url' => $_ENV['SITE_BASE_URL'],
+                    'path' => $path
                 ]),
             );
-
-        /*
-        $message = (new Email())
-            ->from($_ENV['ADMIN_EMAIL'])
-            ->to($this->functArgs->get('user')->getEmail())
-            ->subject('Confirmation de votre inscription')
-            ->html($this->twig->render('email/userConfirmRegistration.html.twig', [
-                    'username' => $this->functArgs->get('user')->getUsername(),
-                    'id' => $this->functArgs->get('user')->getId(),
-                    'token' => $this->functArgs->get('user')->getUserToken()->getToken()
-                ]),
-            );
-            */
 
         $this->mailer->send($message);
     }
