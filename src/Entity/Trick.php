@@ -6,11 +6,15 @@ use App\Repository\TrickRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\BrowserKit\History;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass=TrickRepository::class)
+ * @UniqueEntity(
+ *  fields={"name"},
+ *  message="Une figure du même nom existe déjà."
+ * )
  */
 class Trick
 {
@@ -25,9 +29,9 @@ class Trick
      * @ORM\Column(type="string", length=255, unique=true)
      * @Assert\Length(
      *      min=2,
-     *      minMessage="Le nom doit contenir au moins deux caractères",
+     *      minMessage="Le nom doit contenir au moins deux caractères.",
      *      max=255,
-     *      maxMessage="Le nom ne peut pas dépasser 255 caractères")
+     *      maxMessage="Le nom ne peut pas dépasser 255 caractères.")
      */
     private $name;
 
@@ -35,7 +39,7 @@ class Trick
      * @ORM\Column(type="text")
      * @Assert\Length(
      *      min=20,
-     *      minMessage="La description doit comporter au moins 20 caractères")
+     *      minMessage="La description doit comporter au moins 20 caractères.")
      */
     private $description;
 
@@ -245,7 +249,7 @@ class Trick
                 return $image;
             }
         }
-        return null;
+        return $this->getImages()[0];
     }
 
     public function setDefaultImage(TrickImage $defaultImage, bool $add = false)

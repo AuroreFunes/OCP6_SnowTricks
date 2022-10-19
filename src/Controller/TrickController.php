@@ -6,9 +6,10 @@ use App\Entity\User;
 use App\Entity\Trick;
 use App\Entity\TrickComment;
 use App\Form\TrickType;
-
+use App\Form\EditTrickType;
 use App\Form\TrickCommentType;
 use App\Service\Trick\AddTrickCommentService;
+use App\Service\Trick\EditTrickService;
 use App\Service\Trick\LoadTricksService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -94,32 +95,41 @@ class TrickController extends AbstractController
     /**
      * @Route("/createTrick/", name="app_trick_create")
      */
-    public function createTrick(Request $request)
-    {   // on peut donner deux routes (avec chacune leur nom) à une fonction !
-            // => avec le paramconverter, ajouter Trick dans les paramètres (et penser à mettre = null)
+    public function createTrick(Request $request, EditTrickService $service)
+    {
+        if (null === $user = $this->getUser()) {
+            $this->addFlash('error', "Vous devez être connecté pour utiliser cette fonctionnalité.");
+            return $this->redirectToRoute('app_home');
+        }
+
         $trick = new Trick();
 
-        /* $form = $this->createFormBuilder($trick)
-            ->add('name')
-            ->add('description')
-            ->add('send', SubmitType::class, [
-                'label' => "Enregistrer"
-            ])
-            ->getForm();
-            */
-
-$form = $this->createForm(TrickType::class, $trick);
-
-        // remplit les champs du formulaires si une trick a été trouvée dans la request
+        $form = $this->createForm(TrickType::class, $trick);
         $form->handleRequest($request);
 
-        // si le formulaire a été soumis et validé
         if ($form->isSubmitted() && $form->isValid()) {
-            // ajouter date de création, history...
 
-            // manager->persist, flush...
+            $service->editTrick(
+                $trick, 
+                $user, 
+                $form['pictures']->getData(), 
+                $form['defaultPicture']->getData()
+            );
 
-            // return $this->redirectToRoute('app...', ['id' => $trick->getId()])
+            if (true === $service->getStatus()) {
+                $this->addFlash('success', "La nouvelle figure a bien été créée.");
+                return $this->redirectToRoute('app_trick_show', ['id' => $service->getResult()['trickId']]);
+            }
+
+            $this->addFlash('error', "Une ou plusieurs erreurs se sont produites.");
+
+            if (!empty($service->getResult()['trickId'])) {
+                $this->addFlash('error', "Toutes les images n'ont pas pu être ajoutées.");
+                return $this->redirectToRoute('app_trick_show', ['id' => $service->getResult()['trickId']]);
+            }
+
+            $this->addFlash('error', "La figure n'a pas pu être créée.");
+            return $this->redirectToRoute('app_home');
         }
 
         $twigParams['trickForm'] = $form->createView();
@@ -129,25 +139,73 @@ $form = $this->createForm(TrickType::class, $trick);
         $twigParams['pageSubTitle'] = "";
         
         return $this->render('pages/tricks/trickForm.html.twig', $twigParams);
-        
-        // return $this->redirectToRoute('app_trick_show', ['id' => $trick->getId()]);
     }
 
 
     /**
      * @Route("/editTrick/{id}", name="app_trick_edit")
      */
-    public function editTrick(Trick $trick)
+    public function editTrick(?Trick $trick, Request $request, EditTrickService $service)
     {
-        // TODO
+        if (null === $user = $this->getUser()) {
+            $this->addFlash('error', "Vous devez être connecté pour utiliser cette fonctionnalité.");
+            return $this->redirectToRoute('app_home');
+        }
+
+        if (null === $trick) {
+            $this->addFlash('error', "La figure n'a pas été trouvée.");
+            return $this->redirectToRoute('app_home');
+        }
+
+        $form = $this->createForm(EditTrickType::class, $trick);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $service->editTrick(
+                $trick, 
+                $user, 
+                $form['pictures']->getData(), 
+                $form['defaultPicture']->getData()
+            );
+
+            if (true === $service->getStatus()) {
+                $this->addFlash('success', "La mise à jour a été effectuée.");
+                return $this->redirectToRoute('app_trick_show', ['id' => $service->getResult()['trickId']]);
+            }
+
+            $this->addFlash('error', "Une ou plusieurs erreurs se sont produites.
+                Il est possible que toutes les images n'aient pas pu être ajoutées.");
+        }
+
+        $twigParams['trickForm'] = $form->createView();
+        $twigParams['trick'] = $trick;
+        $twigParams['title'] = "Modifier la figure";
+        $twigParams['formTitle'] = "Modifier la figure";
+        $twigParams['pageTitle'] = "Modifier la figure : ";
+        $twigParams['pageSubTitle'] =  $trick->getName();
+        
+        return $this->render('pages/tricks/trickForm.html.twig', $twigParams);
     }
 
     /**
      * @Route("/deleteTrick/{id}", name="app_trick_delete")
      */
-    public function deleteTrick(Trick $trick)
+    public function deleteTrick(?Trick $trick)
     {
-        // TODO
+        if (null === $user = $this->getUser()) {
+            $this->addFlash('error', "Vous devez être connecté pour utiliser cette fonctionnalité.");
+            return $this->redirectToRoute('app_home');
+        }
+
+        if (null === $trick) {
+            $this->addFlash('error', "La figure n'a pas été trouvée.");
+            return $this->redirectToRoute('app_home');
+        }
+
+        // supprimer les images (fichiers) !!!
+
+        // à supprimer en bdd : vidéos, images, historique, commentaires, puis figure
     }
 
     /**
@@ -160,6 +218,13 @@ $form = $this->createForm(TrickType::class, $trick);
             $this->addFlash('error', "Vous devez être connecté pour ajouter un commentaire !");
             return $this->redirectToRoute('app_user_login');
         }
+
+        if (null === $trick) {
+            $this->addFlash('error', "La figure n'a pas été trouvée.");
+            return $this->redirectToRoute('app_home');
+        }
+
+
 
 
     }

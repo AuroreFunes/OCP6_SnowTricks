@@ -10,7 +10,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class TrickType extends AbstractType
+class EditTrickType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -23,7 +23,7 @@ class TrickType extends AbstractType
             ])
             ->add('defaultPicture', FileType::class, [
                 'mapped'    => false,
-                'required'  => true
+                'required'  => false
             ])
             ->add('pictures', FileType::class, [
                 'mapped'    => false,

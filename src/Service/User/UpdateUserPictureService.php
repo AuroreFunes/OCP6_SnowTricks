@@ -78,7 +78,6 @@ class UpdateUserPictureService extends ServiceHelper
         // check size
         if (1024 * self::MAX_SIZE_ALLOWED < $this->functArgs->get('picture')->getSize()) {
             $this->errMessages->add(self::ERR_FILE_TOO_LARGE);
-            dd("echec verif taille");
             return false;
         }
 

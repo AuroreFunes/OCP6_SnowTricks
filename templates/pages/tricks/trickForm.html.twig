@@ -1,11 +1,25 @@
 {% extends 'commons/base.html.twig' %}
 {% block title %}{{ title }}{% endblock %}
 
+{% block style %}
+    <style type="text/css">
+        header.masthead { 
+            background: url("{{ asset('img/contact-bg.jpg') }}") center no-repeat !important;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .btn-center {
+            text-align: center;
+        }
+    </style>
+{% endblock %}
+
 {% block content %}
     {% form_theme trickForm 'bootstrap_4_layout.html.twig' %}
-    {{ form_start(trickForm) }}
-
-    {#  {{ form_widget(trickForm) }}  #}
+    {{ form_start(trickForm, {'multipart': true}) }}
 
     {{ form_row(trickForm.name, {
         'label': "Nom de la figure",
@@ -28,10 +42,28 @@
         }})
     }}
 
-    <input type="submit" value="envoyer" />
+    {% if formTitle == "Créer une nouvelle figure" %}
+        {{ form_row(trickForm.defaultPicture, {
+            'label': "Image principale (requis)",
+            'attr': {
+                'required': 'required'
+            }})
+        }}
+    {% else %}
+        {{ form_row(trickForm.defaultPicture, {
+            'label': "Changer l'image principale"
+            })
+        }}
+    {% endif %}
 
+    {{ form_row(trickForm.pictures, {
+        'label': "Ajouter des images"
+        })
+    }}
 
-    {# On peut ajouter le bouton submit manuellement en ajoutant la balise html correspondante #}
+    <div class="form-group btn-center">
+        <input type="submit" value="Publier" class="btn btn-primary" />
+    </div>
 
     {{ form_end(trickForm)}}
 {% endblock %}

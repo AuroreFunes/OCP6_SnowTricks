@@ -29,7 +29,7 @@ class AllFixtures extends Fixture
         $user->setPassword(password_hash('123@dmin!', PASSWORD_DEFAULT));
         $user->setCreatedAt(new \DateTime());
         $user->setIsActive(true);
-        $user->setProfilePicture('https://via.placeholder.com/150');
+        $user->setProfilePicture('default.jpg');
         $manager->persist($user);
 
         // ========================================================================================
