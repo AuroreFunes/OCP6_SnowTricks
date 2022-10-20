@@ -8,6 +8,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EditTrickType extends AbstractType
@@ -29,6 +30,10 @@ class EditTrickType extends AbstractType
                 'mapped'    => false,
                 'required'  => false,
                 'multiple'  => true
+            ])
+            ->add('videos', TextareaType::class, [
+                'mapped'    => false,
+                'required'  => false
             ])
         ;
     }

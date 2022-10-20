@@ -61,6 +61,13 @@
         })
     }}
 
+    {{ form_row(trickForm.videos, {
+        'label': "Ajouter des vidéos (liens séparés par des pipes |)",
+        'attr': {
+            'placeholder': "Liens des vidéos, séparés par des |"
+        }})
+    }}
+
     <div class="form-group btn-center">
         <input type="submit" value="Publier" class="btn btn-primary" />
     </div>

@@ -113,7 +113,8 @@ class TrickController extends AbstractController
                 $trick, 
                 $user, 
                 $form['pictures']->getData(), 
-                $form['defaultPicture']->getData()
+                $form['defaultPicture']->getData(),
+                $form['videos']->getData()
             );
 
             if (true === $service->getStatus()) {
@@ -166,7 +167,8 @@ class TrickController extends AbstractController
                 $trick, 
                 $user, 
                 $form['pictures']->getData(), 
-                $form['defaultPicture']->getData()
+                $form['defaultPicture']->getData(),
+                $form['videos']->getData()
             );
 
             if (true === $service->getStatus()) {

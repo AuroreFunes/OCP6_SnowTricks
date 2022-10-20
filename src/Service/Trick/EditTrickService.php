@@ -6,9 +6,11 @@ use App\Entity\Trick;
 use App\Entity\TrickGroup;
 use App\Entity\TrickHistory;
 use App\Entity\TrickImage;
+use App\Entity\TrickVideo;
 use App\Entity\User;
 use App\Service\PictureServiceHelper;
 use Doctrine\Persistence\ManagerRegistry;
+use SebastianBergmann\Type\MixedType;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class EditTrickService extends PictureServiceHelper
@@ -35,7 +37,8 @@ class EditTrickService extends PictureServiceHelper
         ?Trick $trick, 
         ?User $user, 
         ?array $pictures,
-        ?UploadedFile $defaultPicture
+        ?UploadedFile $defaultPicture,
+        string $videosLinks
     ): self
     {
         $this->initHelper();
@@ -43,6 +46,7 @@ class EditTrickService extends PictureServiceHelper
         $this->functArgs->set('user', $user);
         $this->functArgs->set('defaultPicture', $defaultPicture);
         $this->functArgs->set('pictures', $pictures);
+        $this->functArgs->set('videos', $videosLinks);
 
         if (false === $this->checkParameters()) {
             return $this;
@@ -60,7 +64,11 @@ class EditTrickService extends PictureServiceHelper
         }
 
         if (false === $this->addTrickImages()) {
-            return $this;
+            $statusOk = false;
+        }
+
+        if (false === $this->addVideos()) {
+            $statusOk = false;
         }
 
         $this->status = $statusOk;
@@ -174,6 +182,43 @@ class EditTrickService extends PictureServiceHelper
         // now save in database
         try {
             $this->manager->persist($this->functArgs->get('trick'));
+            $this->manager->flush();
+        } catch (\Exception $e) {
+            $this->errMessages->add(self::ERR_DB_ACCESS);
+            return false;
+        }
+
+        return true;
+    }
+
+    protected function addVideos(): bool
+    {
+        if (empty($this->functArgs->get('videos'))) {
+            return true;
+        }
+
+        $videos = explode("|", $this->functArgs->get('videos'));
+
+        foreach ($videos as $video) {
+
+            // check link
+            if ("http" !== substr(trim($video), 0, 4)) {
+                continue;
+            }
+
+            $trickVideo = new TrickVideo();
+            $trickVideo
+                ->setPath(trim($video))
+                ->setTrick($this->functArgs->get('trick'));
+            
+            $this->functArgs->get('trick')->addVideo($trickVideo);
+
+            $this->manager->persist($trickVideo);
+        }
+
+        $this->manager->persist($this->functArgs->get('trick'));
+
+        try {
             $this->manager->flush();
         } catch (\Exception $e) {
             $this->errMessages->add(self::ERR_DB_ACCESS);
