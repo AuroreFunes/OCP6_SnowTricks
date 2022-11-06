@@ -6,11 +6,11 @@
             class="img-fluid" />
         <div class="gallery-infos">
             <div class="gallery-title">
-                <a href="{{ path('app_trick_show', {'id': trick.id}) }}">{{ trick.name }}</a>
+                <a href="{{ path('app_trick_show', {'id': trick.id}) }}-{{ trick.slug }}">{{ trick.name }}</a>
             </div>
             <div class="gallery-btn">
                 {% if app.user %}
-                    <a href="{{ path('app_trick_edit', {'id': trick.id}) }}">
+                    <a href="{{ path('app_trick_edit', {'id': trick.id}) }}-{{ trick.slug }}">
                         <button type="button" class="btn btn-light btn-sm">
                             <i class="bi bi-pencil-fill"></i>
                         </button>

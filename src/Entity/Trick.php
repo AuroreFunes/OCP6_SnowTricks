@@ -70,6 +70,11 @@ class Trick
      */
     private $trickHistories;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $slug;
+
     public function __construct()
     {
         $this->trickComments = new ArrayCollection();
@@ -295,5 +300,19 @@ class Trick
         }
 
         return $history->getdate();
+    }
+
+    // ========================================================================================
+    // SLUG
+    // ========================================================================================
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(string $slug): self
+    {
+        $this->slug = $slug;
+        return $this;
     }
 }

@@ -10,7 +10,6 @@ use App\Entity\TrickVideo;
 use App\Entity\User;
 use App\Service\PictureServiceHelper;
 use Doctrine\Persistence\ManagerRegistry;
-use SebastianBergmann\Type\MixedType;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class EditTrickService extends PictureServiceHelper
@@ -38,10 +37,12 @@ class EditTrickService extends PictureServiceHelper
         ?User $user, 
         ?array $pictures,
         ?UploadedFile $defaultPicture,
-        string $videosLinks
+        ?string $videosLinks
     ): self
     {
         $this->initHelper();
+
+        // save parameters
         $this->functArgs->set('trick', $trick);
         $this->functArgs->set('user', $user);
         $this->functArgs->set('defaultPicture', $defaultPicture);
@@ -80,11 +81,15 @@ class EditTrickService extends PictureServiceHelper
     // ============================================================================================
     protected function setTrick(): bool
     {
+        // create slug
+        $this->functArgs->get('trick')->setSlug($this->createSlug());
+
         // create history
         $trickHistory = new TrickHistory();
-        $trickHistory->setAuthor($this->functArgs->get('user'));
-        $trickHistory->setTrick($this->functArgs->get('trick'));
-        $trickHistory->setDate(new \DateTime());
+        $trickHistory
+            ->setAuthor($this->functArgs->get('user'))
+            ->setTrick($this->functArgs->get('trick'))
+            ->setDate(new \DateTime());
 
         $this->functArgs->get('trick')->addHistory($trickHistory);
 
@@ -201,8 +206,8 @@ class EditTrickService extends PictureServiceHelper
 
         foreach ($videos as $video) {
 
-            // check link
-            if ("http" !== substr(trim($video), 0, 4)) {
+            // check url
+            if (false === filter_var(trim($video), FILTER_VALIDATE_URL)) {
                 continue;
             }
 
@@ -226,6 +231,28 @@ class EditTrickService extends PictureServiceHelper
         }
 
         return true;
+    }
+
+    protected function createSlug(): string
+    {
+        $title = trim(strtolower($this->functArgs->get('trick')->getName()));
+
+        // create slug
+        $patterns = [
+            "~ ~",
+            "~'~",
+            "~[^a-z0-9-]~",
+            "~--~"
+        ];
+
+        $replace = [
+            "-",
+            "-",
+            "",
+            ""
+        ];
+
+        return preg_replace($patterns, $replace, $title);
     }
 
     // ============================================================================================

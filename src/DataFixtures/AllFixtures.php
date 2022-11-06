@@ -40,18 +40,22 @@ class AllFixtures extends Fixture
 
         // TRICK : mute
         $trick = new Trick();
-        $trick->setName('Mute');
-        $trick->setDescription('Le mute consiste à saisir la carre frontside de la planche entre 
-les deux pieds avec la main avant.');
+        $trick
+                ->setName('Mute')
+                ->setDescription('Le mute consiste à saisir la carre frontside de la planche entre 
+les deux pieds avec la main avant.')
+                ->setSlug('mute');
 
         $trickImg = new TrickImage();
-        $trickImg->setPath('mute.jpg');
-        $trickImg->setIsDefault(true);
+        $trickImg
+                ->setPath('mute.jpg')
+                ->setIsDefault(true);
 
         $trickHistory = new TrickHistory();
-        $trickHistory->setAuthor($user);
-        $trickHistory->setTrick($trick);
-        $trickHistory->setDate(new \DateTime());
+        $trickHistory
+                ->setAuthor($user)
+                ->setTrick($trick)
+                ->setDate(new \DateTime());
 
         $trick->addImage($trickImg);
         $trick->addHistory($trickHistory);
@@ -59,18 +63,22 @@ les deux pieds avec la main avant.');
 
         // TRICK : indy
         $trick = new Trick();
-        $trick->setName('Indy');
-        $trick->setDescription('L\'indy consiste à saisir la carre frontside de la planche, entre 
-les deux pieds, avec la main arrière.');
+        $trick
+                ->setName('Indy')
+                ->setDescription('L\'indy consiste à saisir la carre frontside de la planche, entre 
+les deux pieds, avec la main arrière.')
+                ->setSlug('indy');
 
         $trickImg = new TrickImage();
-        $trickImg->setPath('indy.jpg');
-        $trickImg->setIsDefault(true);
+        $trickImg
+                ->setPath('indy.jpg')
+                ->setIsDefault(true);
 
         $trickHistory = new TrickHistory();
-        $trickHistory->setAuthor($user);
-        $trickHistory->setTrick($trick);
-        $trickHistory->setDate(new \DateTime());
+        $trickHistory
+                ->setAuthor($user)
+                ->setTrick($trick)
+                ->setDate(new \DateTime());
 
         $trick->addImage($trickImg);
         $trick->addHistory($trickHistory);
@@ -78,18 +86,22 @@ les deux pieds, avec la main arrière.');
 
         // TRICK : stalefish
         $trick = new Trick();
-        $trick->setName('Stalefish');
-        $trick->setDescription('Le stalefish consiste à saisir la carre backside de la planche 
-entre les deux pieds avec la main arrière');
+        $trick
+                ->setName('Stalefish')
+                ->setDescription('Le stalefish consiste à saisir la carre backside de la planche 
+entre les deux pieds avec la main arrière')
+                ->setSlug('stalefish');
 
         $trickImg = new TrickImage();
-        $trickImg->setPath('stalefish.jpg');
-        $trickImg->setIsDefault(true);
+        $trickImg
+                ->setPath('stalefish.jpg')
+                ->setIsDefault(true);
 
         $trickHistory = new TrickHistory();
-        $trickHistory->setAuthor($user);
-        $trickHistory->setTrick($trick);
-        $trickHistory->setDate(new \DateTime());
+        $trickHistory
+                ->setAuthor($user)
+                ->setTrick($trick)
+                ->setDate(new \DateTime());
 
         $trick->addImage($trickImg);
         $trick->addHistory($trickHistory);
@@ -106,17 +118,21 @@ entre les deux pieds avec la main arrière');
 
         // TRICK : 180
         $trick = new Trick();
-        $trick->setName('180');
-        $trick->setDescription('Un 180 désigne un demi-tour, soit 180 degrés d\'angle');
+        $trick
+                ->setName('180')
+                ->setDescription('Un 180 désigne un demi-tour, soit 180 degrés d\'angle')
+                ->setSlug('180');
 
         $trickImg = new TrickImage();
-        $trickImg->setPath('180.jpg');
-        $trickImg->setIsDefault(true);
+        $trickImg
+                ->setPath('180.jpg')
+                ->setIsDefault(true);
 
         $trickHistory = new TrickHistory();
-        $trickHistory->setAuthor($user);
-        $trickHistory->setTrick($trick);
-        $trickHistory->setDate(new \DateTime());
+        $trickHistory
+                ->setAuthor($user)
+                ->setTrick($trick)
+                ->setDate(new \DateTime());
 
         $trick->addImage($trickImg);
         $trick->addHistory($trickHistory);
@@ -124,17 +140,21 @@ entre les deux pieds avec la main arrière');
 
         // TRICK : 360
         $trick = new Trick();
-        $trick->setName('360');
-        $trick->setDescription('On dit aussi "trois six". Il consiste à faire un tour complet.');
+        $trick
+                ->setName('360')
+                ->setDescription('On dit aussi "trois six". Il consiste à faire un tour complet.')
+                ->setSlug('360');
 
         $trickImg = new TrickImage();
-        $trickImg->setPath('360.jpg');
-        $trickImg->setIsDefault(true);
+        $trickImg
+                ->setPath('360.jpg')
+                ->setIsDefault(true);
 
         $trickHistory = new TrickHistory();
-        $trickHistory->setAuthor($user);
-        $trickHistory->setTrick($trick);
-        $trickHistory->setDate(new \DateTime());
+        $trickHistory
+                ->setAuthor($user)
+                ->setTrick($trick)
+                ->setDate(new \DateTime());
 
         $trick->addImage($trickImg);
         $trick->addHistory($trickHistory);
@@ -142,17 +162,21 @@ entre les deux pieds avec la main arrière');
 
         // TRICK : 1080
         $trick = new Trick();
-        $trick->setName('1080');
-        $trick->setDescription('On l\'appelle aussi "big foot". Il consiste à faire trois tours.');
+        $trick
+                ->setName('1080')
+                ->setDescription('On l\'appelle aussi "big foot". Il consiste à faire trois tours.')
+                ->setSlug('1080');
 
         $trickImg = new TrickImage();
-        $trickImg->setPath('1080.jpg');
-        $trickImg->setIsDefault(true);
+        $trickImg
+                ->setPath('1080.jpg')
+                ->setIsDefault(true);
 
         $trickHistory = new TrickHistory();
-        $trickHistory->setAuthor($user);
-        $trickHistory->setTrick($trick);
-        $trickHistory->setDate(new \DateTime());
+        $trickHistory
+                ->setAuthor($user)
+                ->setTrick($trick)
+                ->setDate(new \DateTime());
 
         $trick->addImage($trickImg);
         $trick->addHistory($trickHistory);
@@ -169,17 +193,21 @@ entre les deux pieds avec la main arrière');
 
         // TRICK : Front flip
         $trick = new Trick();
-        $trick->setName('Front flip');
-        $trick->setDescription('Il s\'agit d\'une roration verticale vers l\'avant.');
+        $trick
+                ->setName('Front flip')
+                ->setDescription('Il s\'agit d\'une roration verticale vers l\'avant.')
+                ->setSlug('front-flip');
 
         $trickImg = new TrickImage();
-        $trickImg->setPath('front_flip.jpg');
-        $trickImg->setIsDefault(true);
+        $trickImg
+                ->setPath('front_flip.jpg')
+                ->setIsDefault(true);
 
         $trickHistory = new TrickHistory();
-        $trickHistory->setAuthor($user);
-        $trickHistory->setTrick($trick);
-        $trickHistory->setDate(new \DateTime());
+        $trickHistory
+                ->setAuthor($user)
+                ->setTrick($trick)
+                ->setDate(new \DateTime());
 
         $trick->addImage($trickImg);
         $trick->addHistory($trickHistory);
@@ -187,17 +215,21 @@ entre les deux pieds avec la main arrière');
         
         // TRICK : Back flip
         $trick = new Trick();
-        $trick->setName('Back flip');
-        $trick->setDescription('Il s\'agit d\'une roration verticale vers l\'arrière.');
+        $trick
+                ->setName('Back flip')
+                ->setDescription('Il s\'agit d\'une roration verticale vers l\'arrière.')
+                ->setSlug('back-flip');
 
         $trickImg = new TrickImage();
-        $trickImg->setPath('back_flip.jpg');
-        $trickImg->setIsDefault(true);
+        $trickImg
+                ->setPath('back_flip.jpg')
+                ->setIsDefault(true);
 
         $trickHistory = new TrickHistory();
-        $trickHistory->setAuthor($user);
-        $trickHistory->setTrick($trick);
-        $trickHistory->setDate(new \DateTime());
+        $trickHistory
+                ->setAuthor($user)
+                ->setTrick($trick)
+                ->setDate(new \DateTime());
 
         $trick->addImage($trickImg);
         $trick->addHistory($trickHistory);
@@ -214,22 +246,26 @@ entre les deux pieds avec la main arrière');
 
         // TRICK : Slide
         $trick = new Trick();
-        $trick->setName('Slide');
-        $trick->setDescription('Un slide consiste à glisser sur une barre de slide. Le slide se 
+        $trick
+                ->setName('Slide')
+                ->setDescription('Un slide consiste à glisser sur une barre de slide. Le slide se 
 fait soit avec la planche dans l\'axe de la barre, soit perpendiculaire, soit plus ou moins désaxé.
 
 On peut slider avec la planche centrée par rapport à la barre (celle-ci se situe approximativement 
 au-dessous des pieds du rideur), mais aussi en nose slide, c\'est-à-dire l\'avant de la planche 
-sur la barre, ou en tail slide, l\'arrière de la planche sur la barre.');
+sur la barre, ou en tail slide, l\'arrière de la planche sur la barre.')
+                ->setSlug('slide');
 
         $trickImg = new TrickImage();
-        $trickImg->setPath('slide.jpg');
-        $trickImg->setIsDefault(true);
+        $trickImg
+                ->setPath('slide.jpg')
+                ->setIsDefault(true);
 
         $trickHistory = new TrickHistory();
-        $trickHistory->setAuthor($user);
-        $trickHistory->setTrick($trick);
-        $trickHistory->setDate(new \DateTime());
+        $trickHistory
+                ->setAuthor($user)
+                ->setTrick($trick)
+                ->setDate(new \DateTime());
 
         $trick->addImage($trickImg);
         $trick->addHistory($trickHistory);
@@ -246,20 +282,24 @@ sur la barre, ou en tail slide, l\'arrière de la planche sur la barre.');
 
         // TRICK : Slide
         $trick = new Trick();
-        $trick->setName('One foot trick');
-        $trick->setDescription('Figure réalisée avec un pied décroché de la fixation, afin de 
+        $trick
+                ->setName('One foot trick')
+                ->setDescription('Figure réalisée avec un pied décroché de la fixation, afin de 
 tendre la jambe correspondante pour mettre en évidence le fait que le pied n\'est pas fixé. Ce 
 type de figure est extrêmement dangereuse pour les ligaments du genou en cas de mauvaise 
-réception.');
+réception.')
+                ->setSlug('one-foot-trick');
 
         $trickImg = new TrickImage();
-        $trickImg->setPath('one_foot_trick.jpg');
-        $trickImg->setIsDefault(true);
+        $trickImg
+                ->setPath('one_foot_trick.jpg')
+                ->setIsDefault(true);
 
         $trickHistory = new TrickHistory();
-        $trickHistory->setAuthor($user);
-        $trickHistory->setTrick($trick);
-        $trickHistory->setDate(new \DateTime());
+        $trickHistory
+                ->setAuthor($user)
+                ->setTrick($trick)
+                ->setDate(new \DateTime());
 
         $trick->addImage($trickImg);
         $trick->addHistory($trickHistory);

@@ -9,6 +9,10 @@ use App\Form\TrickType;
 use App\Form\EditTrickType;
 use App\Form\TrickCommentType;
 use App\Service\Trick\AddTrickCommentService;
+use App\Service\Trick\CheckTrickService;
+use App\Service\Trick\DeleteTrickImageService;
+use App\Service\Trick\DeleteTrickService;
+use App\Service\Trick\DeleteTrickVideoService;
 use App\Service\Trick\EditTrickService;
 use App\Service\Trick\LoadTricksService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -30,7 +34,8 @@ class TrickController extends AbstractController
         $twigParams = [];
 
         if (null === $trick) {
-            $this->addFlash('error', "La figure à laquelle vous essayez d'accéder n'existe pas ou a été supprimée.");
+            $this->addFlash('error', 
+                "La figure à laquelle vous essayez d'accéder n'existe pas ou a été supprimée.");
             return $this->redirectToRoute('app_home');
         }
 
@@ -44,7 +49,9 @@ class TrickController extends AbstractController
             /** @var ?User $user */
             if (null === $user = $this->getUser()) {
                 $this->addFlash('error', "Vous devez être connecté pour ajouter un commentaire !");
-                return $this->redirectToRoute('app_trick_show', ['id' => $trick->getId()]);
+                return $this->redirectToRoute('app_trick_show', [
+                    'id' => $trick->getId() . "-" . $trick->getSlug()
+                ]);
             }
 
             // add the new comment
@@ -52,11 +59,15 @@ class TrickController extends AbstractController
 
             if (false === $service->getStatus()) {
                 $this->addFlash('error', "Une erreur interne s'est produite. Merci de réessayer plus tard.");
-                return $this->redirectToRoute('app_trick_show', ['id' => $trick->getId()]);
+                return $this->redirectToRoute('app_trick_show', [
+                    'id' => $trick->getId() . "-" . $trick->getSlug()
+                ]);
             }
 
             $this->addFlash('success', "Votre commentaire a bien été ajouté.");
-            return $this->redirectToRoute('app_trick_show', ['id' => $trick->getId()]);
+            return $this->redirectToRoute('app_trick_show', [
+                'id' => $trick->getId() . "-" . $trick->getSlug()
+            ]);
         }
 
         $twigParams['commentForm'] = $form->createView();
@@ -119,7 +130,10 @@ class TrickController extends AbstractController
 
             if (true === $service->getStatus()) {
                 $this->addFlash('success', "La nouvelle figure a bien été créée.");
-                return $this->redirectToRoute('app_trick_show', ['id' => $service->getResult()['trickId']]);
+                return $this->redirectToRoute('app_trick_show', [
+                    'id' => $service->getResult()['trickId'] . "-" .
+                    $service->getArguments()['trick']->getSlug()
+                ]);
             }
 
             $this->addFlash('error', "Une ou plusieurs erreurs se sont produites.");
@@ -173,7 +187,9 @@ class TrickController extends AbstractController
 
             if (true === $service->getStatus()) {
                 $this->addFlash('success', "La mise à jour a été effectuée.");
-                return $this->redirectToRoute('app_trick_show', ['id' => $service->getResult()['trickId']]);
+                return $this->redirectToRoute('app_trick_show', [
+                    'id' => $trick->getId() . "-" . $trick->getSlug()
+                ]);
             }
 
             $this->addFlash('error', "Une ou plusieurs erreurs se sont produites.
@@ -193,43 +209,125 @@ class TrickController extends AbstractController
     /**
      * @Route("/deleteTrick/{id}", name="app_trick_delete")
      */
-    public function deleteTrick(?Trick $trick)
+    public function deleteTrick(?Trick $trick, DeleteTrickService $service)
+    {
+        if (null === $trick) {
+            $this->addFlash('error', "La figure n'existe pas.");
+            return $this->redirectToRoute('app_home');
+        }
+
+        if (null === $user = $this->getUser()) {
+            $this->addFlash('error', "Vous devez être connecté pour utiliser cette fonctionnalité.");
+            return $this->redirectToRoute('app_trick_show', [
+                'id' => $trick->getId() . "-" . $trick->getSlug()
+            ]);
+        }
+
+        $service->deleteTrick($user, $trick);
+
+        if (false === $service->getStatus()) {
+            foreach($service->getResult() as $message) {
+                $this->addFlash('warning', $message);
+            }
+
+            return $this->redirectToRoute('app_home');
+        }
+
+        $this->addFlash('success', "La suppression a bien été effectuée.");
+        return $this->redirectToRoute('app_home');
+    }
+
+    // ============================================================================================
+    // XML HTTP REQUEST
+    // ============================================================================================
+
+    /**
+     * @Route("/deleteTrick/", name="xhr_trick_delete")
+     */
+    public function xhrDeleteTrick(
+        Request $request, 
+        CheckTrickService $checkTrickService, 
+        DeleteTrickService $deleteService
+    )
     {
         if (null === $user = $this->getUser()) {
             $this->addFlash('error', "Vous devez être connecté pour utiliser cette fonctionnalité.");
-            return $this->redirectToRoute('app_home');
+            return new JsonResponse("Accès impossible.", 400);
         }
 
-        if (null === $trick) {
-            $this->addFlash('error', "La figure n'a pas été trouvée.");
-            return $this->redirectToRoute('app_home');
+        $params = $request->request->all();
+
+        $checkTrickService->checkTrick($params);
+
+        if (false === $checkTrickService->getStatus()) {
+            $this->addFlash('error', "La figure n'a pas été trouvée ou n'existe pas.");
+            return new JsonResponse("La figure n'existe pas.", 400);
         }
 
-        // supprimer les images (fichiers) !!!
+        $deleteService->deleteTrick($user, $checkTrickService->getResult()['trick']);
 
-        // à supprimer en bdd : vidéos, images, historique, commentaires, puis figure
+        if (false === $deleteService->getStatus()) {
+            foreach($deleteService->getResult() as $message) {
+                $this->addFlash('warning', $message);
+            }
+
+            return new JsonResponse($deleteService->getResult(), $deleteService->getHttpResponseCode());
+        }
+
+        $this->addFlash('success', "La suppression a bien été effectuée.");
+        return new JsonResponse("La suppression a bien été effectuée.", $deleteService->getHttpResponseCode());
     }
 
     /**
-     * @Route("/commentTrick/{id}", name="app_trick_addComment")
+     * @Route("/deleteImage/", name="xhr_trick_delete_image")
      */
-    public function addTrickComment(Trick $trick)
+    public function xhrDeleteTrickImage(Request $request, DeleteTrickImageService $service)
     {
-        /** @var User $user */
         if (null === $user = $this->getUser()) {
-            $this->addFlash('error', "Vous devez être connecté pour ajouter un commentaire !");
-            return $this->redirectToRoute('app_user_login');
+            $this->addFlash('error', "Vous devez être connecté pour utiliser cette fonctionnalité.");
+            return new JsonResponse("Accès impossible.", 400);
         }
 
-        if (null === $trick) {
-            $this->addFlash('error', "La figure n'a pas été trouvée.");
-            return $this->redirectToRoute('app_home');
+        $params = $request->request->all();
+
+        $service->deleteTrickImage($user, $params);
+
+        if (false === $service->getStatus()) {
+            foreach($service->getResult() as $message) {
+                $this->addFlash('error', $message);
+            }
+
+            return new JsonResponse($service->getResult(), $service->getHttpResponseCode());
         }
 
-
-
-
+        $this->addFlash('success', "L'image a bien été supprimée.");
+        return new JsonResponse("L'image a bien été supprimée.", 200);
     }
 
+    /**
+     * @Route("/deleteVideo/", name="xhr_trick_delete_video")
+     */
+    public function xhrDeleteTrickVideo(Request $request, DeleteTrickVideoService $service)
+    {
+        if (null === $user = $this->getUser()) {
+            $this->addFlash('error', "Vous devez être connecté pour utiliser cette fonctionnalité.");
+            return new JsonResponse("Accès impossible.", 400);
+        }
+
+        $params = $request->request->all();
+
+        $service->deleteTrickVideo($user, $params);
+
+        if (false === $service->getStatus()) {
+            foreach($service->getResult() as $message) {
+                $this->addFlash('error', $message);
+            }
+
+            return new JsonResponse($service->getResult(), $service->getHttpResponseCode());
+        }
+
+        $this->addFlash('success', "La vidéo a bien été supprimée.");
+        return new JsonResponse("La vidéo a bien été supprimée.", 200);
+    }
 
 }

@@ -18,7 +18,15 @@
 {% endblock %}
 
 {% block content %}
+    {% include 'commons/flashMessages.html.twig' %}
+
     {% form_theme trickForm 'bootstrap_4_layout.html.twig' %}
+
+    {% if formTitle == "Modifier la figure" and trick is defined %}
+        {% include 'pages/tricks/trickMediaForm.html.twig' %}
+    {% endif %}
+
+
     {{ form_start(trickForm, {'multipart': true}) }}
 
     {{ form_row(trickForm.name, {
@@ -69,8 +77,75 @@
     }}
 
     <div class="form-group btn-center">
+        {% if formTitle == "Modifier la figure" and trick is defined %}
+            <button type="button" class="btn btn-danger openModalDeleteTrick" data-bs-toggle="modal" 
+                data-bs-target="#deleteTrickModal">
+                Supprimer
+            </button>
+        {% endif %}
+
         <input type="submit" value="Publier" class="btn btn-primary" />
     </div>
 
     {{ form_end(trickForm)}}
+{% endblock %}
+
+{% block javaScript %}
+<script type="text/javascript">
+
+    $(document).ready(function() {
+
+        // save ImageId for deleteModal
+        $(document).on("click",".openModalDeleteImage", function() {
+            document.getElementById('imageId').value = $(this).data("id");
+        });
+
+        // save VideoId for deleteModal
+        $(document).on("click",".openModalDeleteVideo", function() {
+            document.getElementById('videoId').value = $(this).data("id");
+        });
+
+
+        // delete one image
+        $(document).on("click", "#deleteImage", function() {
+            let imageId = document.getElementById('imageId').value;
+
+            $.ajax({
+                url: "{{ path('xhr_trick_delete_image') }}",
+                type: "POST",
+                data: {
+                    id: imageId,
+                },
+                success: function(result) {
+                    location.reload();
+                },
+                error: function() {
+                    alert("Une erreur s'est produite. Réessayez un peu plus tard.");
+                }
+            });
+            
+        });
+
+        // delete one video
+        $(document).on("click", "#deleteVideo", function() {
+            let videoId = document.getElementById('videoId').value;
+
+            $.ajax({
+                url: "{{ path('xhr_trick_delete_video') }}",
+                type: "POST",
+                data: {
+                    id: videoId,
+                },
+                success: function(result) {
+                    location.reload();
+                },
+                error: function() {
+                    alert("Une erreur s'est produite. Réessayez un peu plus tard.");
+                }
+            });
+            
+        });
+
+    });
+</script>
 {% endblock %}
