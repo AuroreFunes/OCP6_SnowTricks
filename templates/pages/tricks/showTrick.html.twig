@@ -1,0 +1,283 @@
+{% extends 'commons/base.html.twig' %}
+
+{% set pageTitle = "" %}
+{% set pageSubTitle = "" %}
+
+{% block title %}{{ trick.name }}{% endblock %}
+
+{% block style %}
+    <!-- DataTable CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.css">
+
+    <style type="text/css">
+        header.masthead { 
+            background: url("{{ asset('img/home-bg.jpg') }}") center no-repeat !important;
+        }
+        .site-heading {
+            display: none;
+        }
+
+        .row {
+            padding: none !important;
+        }
+
+        article header.masthead {
+        {% if trick.defaultImage.path is defined %}
+            background: white url("{{ asset('img/tricks/') }}{{ trick.defaultImage.path }}") center no-repeat !important; 
+        {% else %}
+            background: white url("{{ asset('img/tricks/') }}default.jpg") center no-repeat !important;
+        {% endif %}    
+        }
+        article .site-heading {
+            display: block !important;
+        }
+        .trick-content {
+            position: relative;
+            top: -300px;
+            border: solid 1px black;
+            box-shadow: 2px 2px 10px black;
+        }
+        .trick-content section {
+            padding: 20px;
+        }
+        .trick-btn {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+        }
+        .gallery {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content : space-around;
+            }
+        .gallery figure {
+            margin: 10px;
+            max-width: 200px;
+        }
+        .gallery figure img {
+            border: solid 1px black;
+        }
+        .gallery iframe {
+            max-width: 200px;
+            border: solid 1px black;
+        }
+        .trick-infos {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content : space-around;
+        }
+        .trick-infos div {
+            border-radius : 15px;
+            border: solid 1px black;
+            margin: 3px 10px 3px 10px;
+            padding: 5px;
+            font-size: 0.8em;
+        }
+
+        /* comments */
+        .commentUserImg {
+            width: 102px;
+            margin-right: 10px;
+            text-align: center;
+        }
+        .commentUserImg img {
+            max-width: 100px;
+            max-height: 150px;
+        }
+        .commentContent p {
+            margin: 0;
+        }
+        #display_trick_media {
+            text-align: center;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <article class="trick-content">
+        <header class="masthead">
+            <div class="trick-btn">
+                {% if app.user %}
+                    <a href="{{ path('app_trick_edit', {'id': trick.id}) }}">
+                        <button type="button" class="btn btn-sm"><i class="bi bi-pencil-fill"></i></button>
+                    </a>
+                    <button type="button" class="btn btn-sm openModalDeleteTrick" data-bs-toggle="modal" 
+                        data-bs-target="#deleteTrickModal" data-id="{{ trick.id }}">
+                        <i class="bi bi-trash3-fill"></i>
+                {% endif %}
+            </div>
+
+            <div class="container position-relative px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+                        <div class="site-heading">
+                            <h1>{{ trick.name }}</h1>
+                            <span class="subheading">({{ trick.group.name }})</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <section>
+            {% include 'commons/flashMessages.html.twig' %}
+        </section>
+
+        <div id="display_trick_media">
+            <button id="show_trick_media" class="btn btn-primary">Voir les media</button>
+        </div>
+        <section class="gallery" id="trick_media">
+        {% for image in trick.images %}
+            <figure class="col-lg-3 col-md-4 col-6">
+                <img alt="{{ trick.name }}" src="{{ asset('img/tricks/') }}{{ image.path }}" class="img-fluid" />
+            </figure>
+        {% endfor %}
+
+        {% for video in trick.videos %}
+            <figure class="col-lg-3 col-md-4 col-6">
+                <iframe
+                    src="{{ video.path }}"
+                    frameborder="0"
+                    allow="autoplay; encrypted-media"
+                    allowfullscreen>
+                </iframe>
+            </figure>
+        {% endfor %}   
+        </section>
+
+        <section>
+            {{ trick.description }}
+        </section>
+
+        <section class="trick-infos">
+            <div>Groupe de la figure : {{ trick.group.name }}</div>
+            <div>Date de création : {{ trick.createdAt | date('d/m/Y à h:m') }}</div>
+            {% if trick.createdAt != trick.updatedAt %}
+                <div>Dernière modification : {{ trick.updatedAt | date('d/m/Y à h:m') }}</div>
+            {% endif %}
+        </section>
+
+        <!-- comment form -->
+        <div class="row justify-content-center">
+            <section class="col-8">
+                <hr />
+                {% if not app.user %}
+                    Vous devez être connecté pour ajouter un commentaire.
+                {% else %}
+                    {% form_theme commentForm 'bootstrap_4_layout.html.twig' %}
+                    {{ form_start(commentForm) }}
+
+                        {{ form_row(commentForm.content, {
+                            'label': "Votre commentaire",
+                            'attr': {
+                                'placeholder': "Votre commentaire"
+                            }})
+                        }}
+
+                        <div class="form-group btn-center mt-3">
+                            <input type="submit" value="Publier" class="btn btn-primary" />
+                        </div>
+                    {{ form_end(commentForm) }}
+                {% endif %}
+
+                <hr />
+
+                {% if trick.comments is not empty %}
+                    <table id="commentContent" class="display">
+                        <thead><tr><td></td><td></td></tr></thead>
+                        <tbody>
+                            {% for comment in trick.comments %}
+                                {% include 'pages/tricks/trickComment.html.twig' %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="text-secondary">
+                        Il n'y a pas encore de commentaire.
+                    </p>
+                {% endif %}
+
+            </section>
+        </div>
+    </article>
+
+    <!-- Modal -->
+{% if app.user %}
+<div class="modal fade" id="deleteTrickModal" tabindex="-1" aria-labelledby="deleteTrickModalLabel" 
+    aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteTrickModalLabel">Supprimer la figure</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Souhaitez-vous vraiment supprimer cette figure ?
+        <input type="hidden" name="trickId" id="trickId" />
+      </div>
+      <div class="modal-footer">
+        <a href="{{ path('app_trick_delete', {'id': trick.id}) }}">
+            <button type="button" class="btn btn-danger" id="deleteTrick">Oui</button>
+        </a>
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Non</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block javaScript %}
+    <!-- dataTable for pagination -->
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#commentContent').DataTable({
+                "ordering": false,
+                "searching": false,
+                "lengthChange": false,
+                "info": false
+            });
+        });
+    </script>
+
+    <!-- script for display/hide media -->
+    <script type="text/javascript">
+
+        function displayButton() {
+            if ($(window).width() > 800) {
+                $('#display_trick_media').hide();
+                $('#trick_media').show();
+                $('#show_trick_media').attr('state', 'visible');
+            }
+            else {
+                $('#display_trick_media').show();
+                $('#trick_media').hide();
+                $('#show_trick_media').attr('state', 'hidden');
+            }
+        }
+
+        $(document).ready(function () {
+            displayButton();
+
+            $(window).resize(function () {
+                displayButton();
+            });
+            
+            $(document).on("click","#show_trick_media", function() {
+                // show media list
+                if ($('#show_trick_media').attr('state') == "hidden") {
+                    $('#trick_media').show(1000);
+                    $('#show_trick_media').attr('state', 'visible');
+                    $('#show_trick_media').html('Cacher les medias');
+                } else {
+                    // hide media list
+                    $('#trick_media').hide(1000);
+                    $('#show_trick_media').attr('state', 'hidden');
+                    $('#show_trick_media').html('Montrer les medias');
+                }
+            })
+        });
+</script>
+{% endblock %}

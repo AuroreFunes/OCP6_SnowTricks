@@ -6,9 +6,15 @@ use App\Repository\TrickRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass=TrickRepository::class)
+ * @UniqueEntity(
+ *  fields={"name"},
+ *  message="Une figure du même nom existe déjà."
+ * )
  */
 class Trick
 {
@@ -20,12 +26,20 @@ class Trick
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, unique=true)
+     * @Assert\Length(
+     *      min=2,
+     *      minMessage="Le nom doit contenir au moins deux caractères.",
+     *      max=255,
+     *      maxMessage="Le nom ne peut pas dépasser 255 caractères.")
      */
     private $name;
 
     /**
      * @ORM\Column(type="text")
+     * @Assert\Length(
+     *      min=20,
+     *      minMessage="La description doit comporter au moins 20 caractères.")
      */
     private $description;
 
@@ -37,6 +51,7 @@ class Trick
 
     /**
      * @ORM\OneToMany(targetEntity=TrickComment::class, mappedBy="trick", orphanRemoval=true, cascade={"persist", "remove"})
+     * @ORM\OrderBy({"createdAt" = "DESC"})
      */
     private $trickComments;
 
@@ -54,6 +69,11 @@ class Trick
      * @ORM\OneToMany(targetEntity=TrickHistory::class, mappedBy="trick", orphanRemoval=true, cascade={"persist", "remove"})
      */
     private $trickHistories;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $slug;
 
     public function __construct()
     {
@@ -221,6 +241,78 @@ class Trick
             }
         }
 
+        return $this;
+    }
+
+    // ========================================================================================
+    // PICTURES
+    // ========================================================================================
+    public function getDefaultImage() :?TrickImage
+    {
+        foreach ($this->trickImages as $image) {
+            if ($image->getIsDefault()) {
+                return $image;
+            }
+        }
+        return $this->getImages()[0];
+    }
+
+    public function setDefaultImage(TrickImage $defaultImage, bool $add = false)
+    {
+        $oldImage = $this->getDefaultImage();
+        if (null !== $oldImage) {
+            $oldImage->setIsDefault(false);
+        }
+
+        $defaultImage->setIsDefault(true);
+
+        if ($add) {
+            $this->addImage($defaultImage);
+        }
+
+        return $this;
+    }
+
+    // ========================================================================================
+    // HISTORY
+    // ========================================================================================
+    public function getCreatedAt() :\DateTime
+    {
+        $history = $this->getHistories()->get(0);
+
+        foreach($this->getHistories() as $currentHistory) {
+            if ($history->getDate() > $currentHistory->getDate()) {
+                $history = $currentHistory;
+            }
+        }
+
+        return $history->getDate();
+    }
+
+    public function getUpdatedAt() :\DateTime
+    {
+        $history = $this->getHistories()->get(0);
+
+        foreach($this->getHistories() as $currentHistory) {
+            if ($history->getDate() < $currentHistory->getDate()) {
+                $history = $currentHistory;
+            }
+        }
+
+        return $history->getdate();
+    }
+
+    // ========================================================================================
+    // SLUG
+    // ========================================================================================
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(string $slug): self
+    {
+        $this->slug = $slug;
         return $this;
     }
 }

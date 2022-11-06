@@ -1,0 +1,13 @@
+<tr>
+    <td class="commentUserImg">
+        <img src="{{ asset('img/users/') }}{{ comment.author.profilePicture }}" />
+    </td>
+
+    <td class="commentContent">
+        <p class="text-muted mb-1">
+            <strong class="text-success">{{ comment.author.username }}</strong>
+            <small class="text-muted"> le {{ comment.created | date('d/m/Y H:m:i') }}</small>
+        </p>
+        <p>{{ comment.content }}</p>
+    </td>
+</tr>

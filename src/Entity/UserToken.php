@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Repository\UserTokenRepository;
 use Doctrine\ORM\Mapping as ORM;
 
+use App\Entity\User;
+
 /**
  * @ORM\Entity(repositoryClass=UserTokenRepository::class)
  */
@@ -18,8 +20,8 @@ class UserToken
     private $id;
 
     /**
-     * @ORM\OneToOne(targetEntity=User::class, inversedBy="userToken", cascade={"persist", "remove"})
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="userToken")
+     * @ORM\JoinColumn(name="user_id", nullable=false)
      */
     private $user;
 
@@ -43,7 +45,7 @@ class UserToken
         return $this->user;
     }
 
-    public function setUser(User $user): self
+    public function setUser(?User $user): self
     {
         $this->user = $user;
 

@@ -1,4 +1,10 @@
 {% extends 'commons/base.html.twig' %}
+{% block style %}
+    header.masthead { 
+        background: url("{{ asset('img/error-bg.jpg') }}") center no-repeat !important; 
+    }
+{% endblock %}
+
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}

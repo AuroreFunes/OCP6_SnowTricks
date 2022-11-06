@@ -1,0 +1,18 @@
+<html>
+    <body>
+        <h1>Bienvenue sur SnowTricks, {{ username }} !</h1>
+
+        <p>
+            Pour valider votre e-mail et activer votre compte, merci de cliquer sur le lien ci-dessous.
+        </p>
+
+        <p>
+            <a href="{{ base_url }}/confirmRegistration/{{ path }}">
+                {{ base_url }}/confirmRegistration/{{ path }}</a>
+        </p>
+
+        <p>
+            A bientôt sur SnowTricks !
+        </p>
+    </body>
+</html>

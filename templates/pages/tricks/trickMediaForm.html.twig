@@ -1,0 +1,119 @@
+{% block style %}
+    <style type="text/css">
+        .gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content : space-around;
+        }
+        .gallery figure {
+            border: solid 1px black;
+            margin: 10px;
+            max-width: 200px;
+        }
+        .gallery iframe {
+            max-width: 200px;
+            border: solid 1px black;
+        }
+        .gallery-btn {
+            text-align: right;
+        }
+    </style>
+{% endblock %}
+
+<div class="gallery" id="trick_media">
+{% for image in trick.images %}
+    <figure class="col-lg-3 col-md-4 col-6">
+        <img alt="{{ trick.name }}" src="{{ asset('img/tricks/') }}{{ image.path }}" class="img-fluid" />
+        <div class="gallery-btn">
+            <button type="button" class="btn btn-light btn-sm openModalDeleteImage" data-bs-toggle="modal" 
+                data-bs-target="#deleteImageModal" data-id="{{ image.id }}">
+                <i class="bi bi-trash3-fill"></i>
+            </button>
+        </div>
+    </figure>
+{% endfor %}
+
+{% for video in trick.videos %}
+    <figure class="col-lg-3 col-md-4 col-6">
+        <iframe
+            src="{{ video.path }}"
+            frameborder="0"
+            allow="autoplay; encrypted-media"
+            allowfullscreen>
+        </iframe>
+        <div class="gallery-btn">
+            <button type="button" class="btn btn-light btn-sm openModalDeleteVideo" data-bs-toggle="modal" 
+                data-bs-target="#deleteVideoModal" data-id="{{ video.id }}">
+                <i class="bi bi-trash3-fill"></i>
+            </button>
+        </div>
+    </figure>
+{% endfor %}   
+</div>
+
+{% if app.user %}
+<!-- Modal : delete image -->
+<div class="modal fade" id="deleteImageModal" tabindex="-1" aria-labelledby="deleteImageModalLabel" 
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteImageModalLabel">Supprimer cette image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Souhaitez-vous vraiment supprimer cette image ? Cette action est irréversible.
+                <input type="hidden" name="imageId" id="imageId" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="deleteImage">Oui</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Non</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal : delete video -->
+<div class="modal fade" id="deleteVideoModal" tabindex="-1" aria-labelledby="deleteVideoModalLabel" 
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteVideoModalLabel">Supprimer la vidéo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Souhaitez-vous vraiment supprimer cette vidéo ?
+                <input type="hidden" name="videoId" id="videoId" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="deleteVideo">Oui</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Non</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal : delete trick -->
+<div class="modal fade" id="deleteTrickModal" tabindex="-1" aria-labelledby="deleteTrickModalLabel" 
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteTrickModalLabel">Supprimer la figure</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Souhaitez-vous supprimer définitivement cette figure et tous les média associés ?<br />
+                Cette action est irréversible.
+            </div>
+            <div class="modal-footer">
+                <a href="{{ path('app_trick_delete', {'id': trick.id }) }}">
+                    <button type="button" class="btn btn-danger" id="deleteTrick">Oui</button>
+                </a>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Non</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
