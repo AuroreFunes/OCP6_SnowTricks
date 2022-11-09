@@ -45,7 +45,7 @@ Then, go to the project directory to start the Symfony server with the command :
 
 For the site to work properly, you must indicate in the .env file what its URL is. Change these two lines with your own information :
 
-> SITE_BASE_SCHEME=http
+> SITE_BASE_SCHEME=http  
 > SITE_BASE_HOST=localhost:8000
 
 
@@ -53,5 +53,5 @@ For the site to work properly, you must indicate in the .env file what its URL i
 
 For your site to be able to send e-mail, you must set up the SMTP mailer correctly.
 Complete these two lines in .env file :
-> MAILER_DSN=smtp://user:pass@smtp.example.com:port
+> MAILER_DSN=smtp://user:pass@smtp.example.com:port  
 > ADMIN_EMAIL=your-mail@example.com
